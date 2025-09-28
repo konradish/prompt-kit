@@ -1,62 +1,18 @@
-# prompt-kit
+# Prompt Kit
 
-Reusable prompt components, eval fixtures, and style guides for conversational and tool-using agents. This repository is meant to be shared publicly and consumed either as a Python package or as a git submodule in downstream projects.
+Lightweight library of reusable LLM-ready documents. Every Markdown file is meant to be copied, tweaked, and pasted directly into your chat interface when you need a structured response fast.
 
-## Repository layout
+## What's inside
 
-- `prompts/` – canonical prompt definitions organized by role
-  - `system/`, `task/`, `tools/`, `fragments/` – reusable prompt slices
-  - `fixtures/` – red-team and regression examples to keep prompt diffs small
-  - `evals/` – promptfoo or custom harness definitions
-- `src/prompt_kit/` – lightweight Python utilities for loading and composing prompts
-- `scripts/` – automation helpers (e.g., running evals locally)
-- `tests/` – regression tests for loader utilities and prompt schema validation
+- `docs/` – short templates that capture the shape of common workflows (kickoffs, debugging, outlining, writing style, diagramming)
+- `LICENSE` – MIT license for sharing and remixing
 
-## Front matter convention
+Add new documents by dropping a Markdown file into `docs/` and referencing it from `docs/index.md`.
 
-Prompt files MUST start with YAML front matter so they stay diffable and machine-readable. A minimal example:
+## Usage
 
-```md
----
-id: summarize.v1
-role: system
-owner: core
-risk: low
-tests: [sum_short_english, refuse_pii]
----
-You are a concise summarizer.
-```
+1. Open the document that matches the job you're tackling.
+2. Fill in the blanks or update the checklist for your exact scenario.
+3. Paste the final version into your LLM prompt.
 
-Use semantic version strings in `id` so downstream projects can pin exact prompt revisions. Keep few-shot examples in `prompts/fixtures/` and reference them from the main prompt via placeholders.
-
-## Local development
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .[dev]
-pytest
-```
-
-See `scripts/run-evals.sh` for an example promptfoo workflow.
-
-## Packaging
-
-This repo ships a tiny helper library to make it easy to consume prompts:
-
-```python
-from prompt_kit.loader import load_prompt
-prompt = load_prompt("prompts/system/base-guardrails.md")
-```
-
-The loader returns both metadata and content so callers can enforce policy checks before using a prompt.
-
-## Contributing
-
-1. Run linting and tests (`pytest`).
-2. Capture new red-team failures under `prompts/fixtures/`.
-3. Document notable changes in `CHANGELOG.md` and bump semantic versions in front matter.
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for details.
+Keep contributions short, scannable, and free of tool-specific instructions so they work across models.

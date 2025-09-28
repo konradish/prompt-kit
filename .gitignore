@@ -1,12 +1,11 @@
-__pycache__/
-*.pyc
-.venv/
-.env
-.eggs/
-build/
-dist/
-.pytest_cache/
-.nox/
+# Editor and OS junk
 .DS_Store
-uv.lock
-*.egg-info/
+Thumbs.db
+
+# Local tooling
+.vscode/
+.venv/
+
+# Logs or scratch files
+*.log
+notes/
