@@ -1,30 +1,16 @@
-# FOCUS + HTK (Hypothesis→Test Kernel)
+# FOCUS + HTK (Hypothesis→Test Kernel) — Simple Version Hygiene
 
-Use this prompt to extract a clear next action from any input—whether a messy repo, vague idea, or multi-task list—by finding the best **focus** and emitting a minimal **Hypothesis→Test Kernel (HTK)**. Works for software, troubleshooting, or life logistics without ceremony or scoring tables.
+**Purpose:** From any input (brief, repo, idea dump, task list), (A) choose the best next **FOCUS** and (B) emit one smallest **Hypothesis→Test Kernel** (HTK). Change one thing, define pass/fail, say *why first* in ≤2 sentences. No building on unverified foundations.
 
-## Core Principle
-One prompt, many contexts. Change one thing, define pass/fail, explain *why first* in ≤2 sentences, and never build on unverified foundations.
+**LLM behavior**
 
-## LLM Behavior
-* If input is broad → produce **FOCUS** first (≤3 options), pick one, then emit **HTK**.
-* If already narrow → skip straight to **HTK**.
-* Stay terse. Don't assume unverified results.
-# Locked: FOCUS + HTK (Hypothesis→Test Kernel)
-
-Locked: one prompt, many contexts. Here’s a compact, reusable kernel that works for software, troubleshooting, or life logistics—without getting fluffy or prescriptive.
-
-Purpose: From any input (brief, repo, idea dump, task list), (A) find the best next focus and (B) emit the smallest Hypothesis→Test Kernel (HTK). No scoring tables, no workflow ceremony.
-
-LLM behavior:
-- If the input is broad, produce FOCUS first (≤3 options), pick one, then emit HTK.
-- If already narrow, skip straight to HTK.
-- Keep it terse. Don’t assume unverified results.
-
-Rules: change one thing; define pass/fail; explain why first in ≤2 sentences; no building on unverified foundations.
+* Broad input → produce **FOCUS** (≤3 options), pick one, then **HTK**.
+* Narrow input → go straight to **HTK**.
+* Terse, executable. Don’t assume unverified results.
 
 ---
 
-Output format (always this shape):
+## Output format (always this shape)
 
 ```
 # FOCUS
@@ -33,7 +19,7 @@ Options (≤3):
 - ...
 Chosen: <label>
 
-Inputs needed (ranked, stop when enough): <bulleted list, 3–5 items max>
+Inputs needed (ranked, stop when enough): <3–5 bullets>
 Assumptions (frozen, ≤3): <...>
 
 # HTK
@@ -55,86 +41,62 @@ Decision:
 - Fail → <most likely cause> → <single adjustment> → <rerun plan>
 
 Why first: <≤2 sentences>
+
+# VERSION HYGIENE (simple)
+Pre-check: working tree clean (no staged/unstaged changes)
+Post-check: commit ONLY files touched by this HTK
+Commit message: "HTK:<short-label> — <PASS/FAIL> — <metric summary>"
 ```
 
 ---
 
-Micro-examples
+## Minimal git checklist (optional)
 
-1) Software (general)
+```bash
+# before starting (ensure no loose ends)
+git status --porcelain  # must be empty
+# ...run the HTK work...
+git add <scoped paths only>
+git commit -m "HTK:<short-label> — PASS — e.g., precision 92% (≥90%)"
+```
+
+---
+
+### Example (software)
 
 ```
 # FOCUS
 Options (≤3):
-- Onboarding contract harness: Render any onboarding route without auth — Why-first: unblocks fast iteration and trims surface area safely.
-- Email "actionable?" gate: Prevent junk before parsing — Why-first: downstream depends on signal quality.
-- Minimal event model: Normalize dates/recurrences — Why-first: backbone for all calendar output.
+- Contract harness for onboarding routes — Why-first: removes auth friction; enables quick, safe iteration.
+- Actionable-email gate — Why-first: downstream depends on signal quality.
+- Minimal event model — Why-first: backbone for calendar output.
+Chosen: Contract harness
 
-Chosen: Onboarding contract harness
-
-Inputs needed (ranked): route list → component file, API calls + shapes, one happy/one edge fixture JSON, test runner, MSW availability
-Assumptions (frozen, ≤3): local auth bypass OK; routes mountable from fixtures; network stubbable
+Inputs needed: route→component map; API shapes; two fixtures; test runner; MSW availability
+Assumptions: auth bypass OK; routes mountable from fixtures; network stubbable
 
 # HTK
-Goal: Open any onboarding page instantly (≤1s) with deterministic fixtures.
+Goal: Open any onboarding page instantly with deterministic fixtures.
 
-Hypothesis: If we add a Contract Mode (route+fixture) with MSW stubs, pages render deterministically and pass basic field/CTA checks.
+Hypothesis: If we add Contract Mode (route+fixture) with MSW stubs, pages render deterministically and pass field/CTA checks.
 
 Test:
 - Change: add ContractShell + `?route=&fixture=` + MSW handlers
 - Method: local dev; two fixtures; one Playwright spec; timebox 2–3h
-- Rollback: guard behind env flag; remove route to revert
+- Rollback: disable ContractShell via env flag
 
 Verify:
 - Metric: load <1s; required labels present; CTA state matches fixture
-- Evidence: `contracts/reports/onboarding_contract.md` + trace
+- Evidence: contracts/report.md + Playwright trace
 
 Decision:
-- Pass → add contracts for next screen
+- Pass → add contract for next page
 - Fail → inject fake session provider → rerun
 
-Why first: kills the main friction; creates a rock-solid seam to simplify safely.
+Why first: kills main friction; creates a solid seam to simplify safely.
+
+# VERSION HYGIENE
+Pre-check: `git status` empty
+Post-check: commit scoped files only
+Commit message: "HTK:contract-harness — PASS — load 0.6s; fields/CTA OK"
 ```
-
-2) Non-software (house projects)
-
-```
-# FOCUS
-Options (≤3):
-- Fix leaking faucet: stop water loss + cabinet damage — Why-first: high cost-of-delay; small, reversible.
-- Clear garage zone A: create workspace — Why-first: unlocks later tasks.
-- Replace HVAC filter: air quality + system load — Why-first: 5-minute win; prevents downstream issues.
-
-Chosen: Fix leaking faucet
-
-Inputs needed (ranked): valve access, gasket type, tool list, photo of assembly
-Assumptions (frozen): supply valves work; no pipe corrosion
-
-# HTK
-Goal: Stop under-sink leak for 7 consecutive days.
-
-Hypothesis: If we replace the cartridge + gasket, the cabinet base stays dry (moisture card shows ≤5% change).
-
-Test:
-- Change: swap cartridge/gasket
-- Method: shutoff → swap → paper towel + moisture card; check daily; 20 min + 7-day watch
-- Rollback: reinstall old part, schedule plumber
-
-Verify:
-- Metric: zero visible drips; moisture card stable ≤5%
-- Evidence: dated photo log
-
-Decision:
-- Pass → seal cabinet edge; Next: garage zone A
-- Fail → likely supply line/valve → replace line → rerun
-
-Why first: highest risk/cost if ignored; smallest decisive fix.
-```
-
----
-
-Minimal "input pack" (optional, domain-agnostic)
-
-* Inventory snapshot: list of candidate areas (3–7 bullets).
-* Constraints: timebox, tools/resources, don’t-break rules.
-* One happy + one edge case (or photo) for the chosen area.
