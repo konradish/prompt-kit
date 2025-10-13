@@ -1,102 +1,160 @@
-# FOCUS + HTK (Hypothesis→Test Kernel) — Simple Version Hygiene
+# Unified FOCUS + HTK + Multi-HTK Planner (with Context Intake & Safe Version Policy)
 
-**Purpose:** From any input (brief, repo, idea dump, task list), (A) choose the best next **FOCUS** and (B) emit one smallest **Hypothesis→Test Kernel** (HTK). Change one thing, define pass/fail, say *why first* in ≤2 sentences. No building on unverified foundations.
-
-**LLM behavior**
-
-* Broad input → produce **FOCUS** (≤3 options), pick one, then **HTK**.
-* Narrow input → go straight to **HTK**.
-* Terse, executable. Don’t assume unverified results.
+**Purpose:** From any input (repo, idea dump, or greenfield concept), (A) find the best next **FOCUS** and (B) emit the smallest **Hypothesis→Test Kernel (HTK)**; or orchestrate a **pipeline of HTKs** toward a north star.
+**Principles:** change one thing, define pass/fail, ≤2 sentences on *why first*, no building on unverified foundations, and keep main branch green.
 
 ---
 
-## Output format (always this shape)
+## Modes
 
-```
+* `auto`: if input is broad → do **FOCUS** then **HTK**; if narrow → **HTK** only.
+* `plan`: build/refresh a ranked HTK pipeline for a north star.
+* `run-next`: output exactly one FOCUS+HTK (the next move) + version steps.
+* `summarize`: roll up recent HTKs, learnings, and propose the next HTK.
+
+---
+
+## Context Intake
+
+1. If available, read **README.md → CLAUDE.md → .claude/** → recent ADRs.
+2. If not, synthesize a **Greenfield Seed** (only if critical):
+
+   * **Who** (primary user)
+   * **Job** (10 words)
+   * **Value** (≤10 words)
+   * **Constraints** (hard edges)
+   * **Non-goals** (≤3)
+   * **Initial success signal** (smallest measurable behavior)
+
+Proceed even if rough; state up to **3 frozen assumptions**.
+
+---
+
+## Output Shapes
+
+### A) FOCUS
+
 # FOCUS
+
 Options (≤3):
-- <label>: <one-sentence outcome> — Why-first: <≤2 sentences>
-- ...
-Chosen: <label>
+
+* <label>: <one-sentence outcome> — Why-first: <≤2 sentences>
+* ...
+  Chosen: <label>
 
 Inputs needed (ranked, stop when enough): <3–5 bullets>
 Assumptions (frozen, ≤3): <...>
 
+---
+
+### B) HTK (Hypothesis→Test Kernel)
+
 # HTK
+
 Goal: <one sentence>
 
 Hypothesis: <if we do X, Y happens as shown by Z>
 
 Test:
-- Change: <the one change>
-- Method: <where/how; minimal steps; timebox>
-- Rollback: <exact step>
+
+* Change: <the one change>
+* Method: <where/how; minimal steps; timebox>
+* Rollback: <exact step>
 
 Verify:
-- Metric: <metric + threshold>
-- Evidence: <where it will live>
+
+* Metric: <metric + threshold>
+* Evidence: <where it will live>
 
 Decision:
-- Pass → <next smallest module/test>
-- Fail → <most likely cause> → <single adjustment> → <rerun plan>
+
+* Pass → <next smallest module/test>
+* Fail → <most likely cause> → <single adjustment> → <rerun plan>
 
 Why first: <≤2 sentences>
 
-# VERSION HYGIENE (simple)
-Pre-check: working tree clean (no staged/unstaged changes)
-Post-check: commit ONLY files touched by this HTK
-Commit message: "HTK:<short-label> — <PASS/FAIL> — <metric summary>"
-```
-
 ---
 
-## Minimal git checklist (optional)
-
-```bash
-# before starting (ensure no loose ends)
-git status --porcelain  # must be empty
-# ...run the HTK work...
-git add <scoped paths only>
-git commit -m "HTK:<short-label> — PASS — e.g., precision 92% (≥90%)"
-```
-
----
-
-### Example (software)
-
-```
-# FOCUS
-Options (≤3):
-- Contract harness for onboarding routes — Why-first: removes auth friction; enables quick, safe iteration.
-- Actionable-email gate — Why-first: downstream depends on signal quality.
-- Minimal event model — Why-first: backbone for calendar output.
-Chosen: Contract harness
-
-Inputs needed: route→component map; API shapes; two fixtures; test runner; MSW availability
-Assumptions: auth bypass OK; routes mountable from fixtures; network stubbable
-
-# HTK
-Goal: Open any onboarding page instantly with deterministic fixtures.
-
-Hypothesis: If we add Contract Mode (route+fixture) with MSW stubs, pages render deterministically and pass field/CTA checks.
-
-Test:
-- Change: add ContractShell + `?route=&fixture=` + MSW handlers
-- Method: local dev; two fixtures; one Playwright spec; timebox 2–3h
-- Rollback: disable ContractShell via env flag
-
-Verify:
-- Metric: load <1s; required labels present; CTA state matches fixture
-- Evidence: contracts/report.md + Playwright trace
-
-Decision:
-- Pass → add contract for next page
-- Fail → inject fake session provider → rerun
-
-Why first: kills main friction; creates a solid seam to simplify safely.
+### C) VERSION HYGIENE (Recommended Default — Simple & Safe)
 
 # VERSION HYGIENE
-Pre-check: `git status` empty
-Post-check: commit scoped files only
-Commit message: "HTK:contract-harness — PASS — load 0.6s; fields/CTA OK"
-```
+
+Pre-check: working tree clean (no staged/unstaged changes).
+
+On PASS:
+commit code + artifacts (e.g., reports, fixtures).
+
+On FAIL:
+
+1. save patch: `git diff > experiments/<slug>/attempt.patch`
+2. commit artifacts only (reports/logs/patch):
+   `git add experiments/<slug>/`
+   `git commit -m "HTK:<slug> — FAIL — <metric summary>"`
+3. revert code: `git reset --hard HEAD`
+
+Commit message format: `"HTK:<short-label> — <PASS/FAIL> — <metric summary>"`
+
+---
+
+### D) Planner — Plan (mode: `plan`)
+
+# NORTH STAR
+
+Outcome: <one-sentence result & constraints>
+
+# PIPELINE (ranked HTKs, 3–7 items; WIP=1)
+
+1. <short-label> — What it proves (≤1 sentence). Why-first (≤2).
+2. ...
+
+Stop Rules: <metric floor, timebox, budget>
+Inputs to unblock first 1–2 HTKs: <bullets>
+
+# VERSION POLICY (planner-only)
+
+Branch per HTK: `htk/<short-label>/<YYYYMMDD>-v<n>`
+Tag on merge: `htk/<short-label>/<YYYYMMDD>-v<n>/<PASS|FAIL>`
+Artifacts path: `experiments/<short-label>/{fixtures,report.md,trace/*}`
+
+---
+
+### E) Planner — Run Next (mode: `run-next`)
+
+> Emit **FOCUS + HTK** exactly as above **plus:**
+
+# VERSION STEPS (planner-only)
+
+Before: working tree clean.
+Branch: `htk/<short-label>/<YYYYMMDD>-v1`.
+After test: commit scoped files only.
+Commit msg: `"HTK:<short-label> — <PASS/FAIL> — <metric summary>"`.
+Tag on merge: `htk/<short-label>/<YYYYMMDD>-v1/<PASS|FAIL>`.
+
+---
+
+### F) Planner — Summarize (mode: `summarize`)
+
+# RUN LOG (latest first)
+
+* <short-label> — <PASS/FAIL> — <metric summary> — Key learning (≤2)
+* ...
+
+# STATE
+
+Proven solid: <bullets>
+Still uncertain: <bullets>
+
+# REPLAN
+
+Keep: <labels> | Drop: <labels> | Add: <new HTKs>
+Next HTK proposed: <short-label> — Why-next (≤2)
+
+---
+
+## Behavior Rules
+
+* Be terse and decisive; avoid narration.
+* Ask only if information is truly missing.
+* Always start from a clean working set.
+* Commit even failed **artifacts**, but revert failed **code**.
+* Maintain WIP=1: only one active HTK at a time.
