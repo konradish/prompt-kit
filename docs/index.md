@@ -3,6 +3,7 @@
 This folder collects ready-to-use LLM documents. Copy the template you need, fill in the blanks, and paste it into your preferred chat interface.
 
 ## Available Documents
+- **focus-htk.md** – Extract the best next action from broad inputs using FOCUS + Hypothesis→Test Kernel. Works across software, troubleshooting, and life logistics.
 - **project-kickoff.md** – Frame new tasks with goals, constraints, and communication plans.
 - **solution-outline.md** – Summarize how to approach a known problem before writing detailed output.
 - **debugging-playbook.md** – Walk through reproducing, isolating, and fixing issues methodically.
