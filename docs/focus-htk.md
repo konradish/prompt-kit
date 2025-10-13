@@ -9,14 +9,26 @@ One prompt, many contexts. Change one thing, define pass/fail, explain *why firs
 * If input is broad → produce **FOCUS** first (≤3 options), pick one, then emit **HTK**.
 * If already narrow → skip straight to **HTK**.
 * Stay terse. Don't assume unverified results.
+# Locked: FOCUS + HTK (Hypothesis→Test Kernel)
+
+Locked: one prompt, many contexts. Here’s a compact, reusable kernel that works for software, troubleshooting, or life logistics—without getting fluffy or prescriptive.
+
+Purpose: From any input (brief, repo, idea dump, task list), (A) find the best next focus and (B) emit the smallest Hypothesis→Test Kernel (HTK). No scoring tables, no workflow ceremony.
+
+LLM behavior:
+- If the input is broad, produce FOCUS first (≤3 options), pick one, then emit HTK.
+- If already narrow, skip straight to HTK.
+- Keep it terse. Don’t assume unverified results.
+
+Rules: change one thing; define pass/fail; explain why first in ≤2 sentences; no building on unverified foundations.
 
 ---
 
-## Output Format (always this shape)
+Output format (always this shape):
 
 ```
 # FOCUS
-Options (≤3): 
+Options (≤3):
 - <label>: <one-sentence outcome> — Why-first: <≤2 sentences>
 - ...
 Chosen: <label>
@@ -47,9 +59,9 @@ Why first: <≤2 sentences>
 
 ---
 
-## Example: Software (General—not just UI)
+Micro-examples
 
-**Context:** SchoolBrain app with onboarding, email processing, and calendar features.
+1) Software (general)
 
 ```
 # FOCUS
@@ -84,11 +96,7 @@ Decision:
 Why first: kills the main friction; creates a rock-solid seam to simplify safely.
 ```
 
----
-
-## Example: Non-Software (House Projects)
-
-**Context:** Multiple pending house tasks (plumbing, organization, HVAC).
+2) Non-software (house projects)
 
 ```
 # FOCUS
@@ -125,21 +133,8 @@ Why first: highest risk/cost if ignored; smallest decisive fix.
 
 ---
 
-## Optional Input Pack (boosts quality, domain-agnostic)
+Minimal "input pack" (optional, domain-agnostic)
 
-Provide these to get sharper output:
-
-* **Inventory snapshot:** list of candidate areas (3–7 bullets).
-* **Constraints:** timebox, tools/resources, don't-break rules.
-* **One happy + one edge case** (or photo) for the chosen area.
-
----
-
-## When to Use
-
-* Starting a feature with many unknowns or paths.
-* Debugging with multiple possible causes.
-* Household or logistics tasks that need prioritization.
-* Any situation where you need to avoid analysis paralysis and focus on the smallest testable step.
-
-Paste this prompt into your LLM interface with your input context. The model will respond with a structured FOCUS + HTK output you can act on immediately.
+* Inventory snapshot: list of candidate areas (3–7 bullets).
+* Constraints: timebox, tools/resources, don’t-break rules.
+* One happy + one edge case (or photo) for the chosen area.
