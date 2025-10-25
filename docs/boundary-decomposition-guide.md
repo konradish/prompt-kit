@@ -1,65 +1,54 @@
-# 🧠 Prompt: Universal Boundary Decomposition and Skill Extraction
+# 🧠 Prompt: Universal Boundary Decomposition v2.1
+
+*(for any project — pure, coupled, or mixed)*
 
 You are an **engineering decomposition agent**.
-Your task is to break a software project — pure or impure, monolith or distributed — into **Boundary Contracts** and **Side-effects Skills** at the correct level of granularity.
-
-Your goal is to map **units of responsibility** that can be:
-
-* independently reasoned about,
-* replayed or tested in isolation,
-* and verified through explicit *state and effect invariants*.
+Break the project into **Boundary Contracts** and **Side-effects Skills** that can be verified, replayed, and traced across the system.
 
 ---
 
 ## 🎯 Objective
 
-Produce a **Boundary Map** that defines for each unit:
+Output a **Boundary Index** and per-boundary **Skill Contracts** such that each boundary:
 
-* **Intent** — what outcome it achieves
-* **Inputs / Dependencies** — what data or state it reads
-* **Effects** — what it changes (DB, APIs, cache, files, events)
-* **Invariants** — what must remain true before/after
-* **Granularity Rationale** — why this boundary stops here (not smaller or larger)
-
-For each boundary, define an accompanying **Skill Skeleton** capable of:
-
-1. running locally (sandbox mode),
-2. replaying safely (idempotent execution),
-3. emitting **PASS / SOFT_FAIL / HARD_FAIL** verdicts.
+1. Owns a **canonical identity** (`subject_id`, `dedupe_key`, `idempotency_scope`)
+2. Declares **all dependencies** (pure or impure)
+3. Describes **inputs → effects → invariants** in machine-checkable form
+4. Defines **timing & retry envelope** (`consistency_window_s`, `retry_policy`, `timeout_s`, `sla_p95_ms`)
+5. Classifies outcomes as **PASS / SOFT_FAIL / HARD_FAIL**
+6. States **security/PII surface and redaction rules**
+7. Names an **owner** (team or person) for accountability
 
 ---
 
 ## ⚙️ Granularity Heuristics
 
-Use these to decide when to **split** or **merge** responsibilities:
-
-| Scenario                                        | Decision                       | Reason                                   |
-| ----------------------------------------------- | ------------------------------ | ---------------------------------------- |
-| Multiple unrelated side effects                 | **Split**                      | Different ownership or timing domains    |
-| Two actions must be atomic (all-or-nothing)     | **Merge**                      | Shared transaction boundary              |
-| Effect has separate idempotency or dedupe logic | **Split**                      | Prevent entangled retries                |
-| Shared workflow state or DB coupling            | **Annotate as dependency**     | Don’t fake purity — declare it read-only |
-| Operation <15 min to implement and not reusable | **Merge**                      | Avoid overslicing                        |
-| Operation >90 min to implement or multi-owner   | **Split**                      | Too coarse to validate easily            |
-| Pure computation (no side effects)              | **Fold into calling boundary** | Keep surface minimal                     |
-| LLM or stochastic step                          | **Add normalization + seed**   | Deterministic replay                     |
+| Situation                       | Action                 | Reason                             |
+| ------------------------------- | ---------------------- | ---------------------------------- |
+| Multiple unrelated side-effects | **Split**              | Different ownership/timing domains |
+| Must succeed/fail atomically    | **Merge**              | Shared transaction boundary        |
+| Different idempotency keys      | **Split**              | Prevent retry entanglement         |
+| Reads shared state              | **Declare dependency** | Don’t fake purity                  |
+| <15 min or non-reusable         | **Merge**              | Avoid overslicing                  |
+| >90 min or multi-owner          | **Split**              | Too coarse to test                 |
+| Stochastic/LLM step             | **Seed + normalize**   | Deterministic replay               |
 
 ---
 
 ## 🧩 Required Outputs
 
-1. `BOUNDARY_INDEX.csv` — rows of all boundaries with intent, inputs, effects, invariants, risk, owner.
-2. For each boundary:
+1. `BOUNDARY_INDEX.csv` — master table of all boundaries
+2. Per-boundary folder containing:
 
    * `SKILL.md` — declarative contract
-   * `skill.py` — orchestration logic
+   * `skill.py` — orchestrator
    * `validators.py` — invariant checks
-   * `tests/kernel_test.py` — HTK kernel test
-   * `effects_recorder.py` — captures all observable side effects
+   * `tests/kernel_test.py` — HTK kernel
+   * `effects_recorder.py` — effect logger
 
 ---
 
-## 🧾 SKILL.md schema (generic)
+## 🧾 SKILL.md Schema (v2.1)
 
 ```yaml
 ---
@@ -68,13 +57,13 @@ summary: <one-sentence outcome>
 applies_to: ["intent:<verb_noun>", "domain:<domain>"]
 
 owner: <team_or_person>
+runner: <module_or_service>
 criticality: LOW|MED|HIGH
-sla: { p50_ms: <int>, p95_ms: <int> }
 
 identity:
-  subject_id: <canonical_id_expr>
-  dedupe_key: <stable_key_expr>
-  idempotency_scope: GLOBAL|SUBJECT|WINDOW:<seconds>
+  subject_id: <canonical_expression>          # e.g. sha256(message_id|source)
+  dedupe_key: <stable_expression>             # defines “once per …”
+  idempotency_scope: GLOBAL|SUBJECT|WINDOW:<s>
 
 inputs:
   - { name: ..., type: ..., required: true }
@@ -83,27 +72,31 @@ dependencies:
   - { name: <state_or_table>, access: READONLY|MUTATES, description: "describe coupling" }
 
 effects:
-  - { surface: db|api|cache|file|event, action: INSERT|UPDATE|DELETE|POST|WRITE, target: ..., cardinality: EXACTLY_ONCE|AT_LEAST_ONCE }
+  - { surface: db|api|cache|file|event,
+      action: INSERT|UPDATE|DELETE|POST|WRITE,
+      target: <resource>,
+      cardinality: EXACTLY_ONCE_PER_KEY|AT_LEAST_ONCE_PER_KEY }
 
 invariants:
-  - "<what must remain true after execution>"
+  - "<must remain true after execution>"
 
 modes: [DRY_RUN, SHADOW, CANARY, FULL]
 
-verdicts:
-  PASS: all invariants hold  
-  SOFT_FAIL: retryable/transient (timeouts, race, eventual consistency)  
-  HARD_FAIL: contract violation (wrong state, schema break)
-
 operational_envelope:
-  time_budget_s: <int>
-  retry_policy: { max: <int>, backoff: EXP|CONST, base_ms: 200 }
   consistency_window_s: <int>
+  retry_policy: { max: <int>, retryable: ["HTTP_5xx","PG_SERIALIZATION"], backoff: EXP|CONST }
+  timeout_s: <int>
+  sla_p95_ms: <int>
 
 security:
   pii_surface: NONE|LOW|MED|HIGH
+  redaction_rules: ["email:hash","body:redact>2MB"]
   secret_refs: []
-  redaction_rules: []
+
+verdicts:
+  PASS: invariants hold
+  SOFT_FAIL: transient/retryable (timeout, race, delay)
+  HARD_FAIL: contract breach (duplicate, wrong state, schema)
 
 htk:
   hypothesis: |
@@ -114,72 +107,50 @@ htk:
 
 ---
 
-## 🧮 Granularity Calibration Algorithm
+## 🧮 Boundary Index Header Template
 
-1. **Identify Effect Surfaces**
-   List every side effect (DB, API, event, cache, file).
+```
+name,intent,subject_id,dedupe_key,idempotency_scope,inputs,dependencies,effects,invariants,mode,consistency_window_s,retry_policy,timeout_s,sla_p95_ms,pii_surface,redaction_rules,owner
+```
 
-2. **Group by Atomicity + Ownership**
-   Combine those that must succeed/fail together or share ownership.
-
-3. **Trace Data Flow**
-   For each boundary, ensure every output can be expressed as a function of declared inputs + dependencies.
-
-   * If hidden globals or shared singletons appear, expose them as `dependencies:`.
-   * If that dependency *changes state*, promote it to a separate boundary.
-
-4. **Validate Size & Scope**
-
-   * 15–90 min implementation rule
-   * ≤6 inputs, ≤3 effects, ≥2 validators
-   * If any limit violated → re-split or merge.
-
-5. **Assign Identity + Invariants**
-
-   * Each effect must carry a `subject_id` for traceability.
-   * Define at least one invariant that can be machine-checked.
-
-6. **Define Test Mode Behavior**
-
-   * Sandbox impure dependencies (FakeDB, FakeCache, HTTP mock).
-   * Re-run same input twice → results identical (idempotent).
-
-7. **Emit Verdict Classification**
-
-   * PASS / SOFT_FAIL / HARD_FAIL
-   * Include reason and suggested retry window.
+Each `effects` cell must specify **per-key semantics** (e.g., `event: EXACTLY_ONCE_PER_KEY email_ingested.v1(key=email_uid)`).
 
 ---
 
-## 🧰 Example Classifications
+## 🧠 Verdict Taxonomy
 
-| Example System Type       | Typical Boundaries                          | Notes                                    |
-| ------------------------- | ------------------------------------------- | ---------------------------------------- |
-| Pure data pipeline        | extract → transform → load                  | Each step atomic, easy to replay         |
-| CRUD web app              | create/update/delete per entity             | Merge when transactions must stay atomic |
-| Event-driven microservice | consume_event → apply_rules → emit_event    | Each handler a boundary                  |
-| Monolith with shared DB   | annotate shared tables as `dependencies:`   | Avoid faking purity                      |
-| LLM-assisted processor    | ingest_input → llm_extract → persist_result | Normalize LLM output, enforce schema     |
+| Verdict       | Meaning             | Example                           |
+| ------------- | ------------------- | --------------------------------- |
+| **PASS**      | All invariants hold | DB row correct + event seen       |
+| **SOFT_FAIL** | Retryable/transient | API 504, cache delay              |
+| **HARD_FAIL** | Contract breach     | Duplicate insert, schema mismatch |
+
+---
+
+## 🧰 Impure Module Rule
+
+If a boundary touches shared or global state:
+
+* Declare it in `dependencies:` with `access: READONLY|MUTATES`.
+* Mock or snapshot it in tests.
+* Never mutate undeclared state.
 
 ---
 
 ## 🧭 Deliverables
 
-After execution, expect:
+After execution the agent should output:
 
-* `BOUNDARY_INDEX.csv` (Markdown summary optional)
-* Two fully generated example boundaries with:
-
-  * kernel test,
-  * validators,
-  * replay harness.
+1. `BOUNDARY_INDEX.csv` fully populated with identity, timing, security, and owner fields.
+2. Two example skill folders demonstrating replay and verdict classification.
 
 ---
 
-### ✅ Decision Rules Recap
+### ✅ Recap
 
-* **Traceability** — every boundary has a `subject_id`.
-* **Accountability** — each boundary has an `owner`.
-* **Transparency** — impurities declared, not hidden.
-* **Reproducibility** — deterministic seeds & mocks.
-* **Resilience** — verdict taxonomy: PASS / SOFT_FAIL / HARD_FAIL.
+* **Traceable** → every effect carries a `subject_id`.
+* **Timed** → each boundary defines its window, retries, SLA.
+* **Transparent** → impurities declared, not hidden.
+* **Secure** → PII surface + redaction rules explicit.
+* **Accountable** → every boundary has an `owner`.
+* **Reproducible** → seeded, normalized, and deterministic.
