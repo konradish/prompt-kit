@@ -1,15 +1,16 @@
-# 🧠 Prompt: Universal Boundary Decomposition v2.4
+# 🧠 Prompt: Universal Boundary Decomposition v2.5
 
 *(for any project — pure, coupled, infra-heavy, or mixed)*
 
 You are an **engineering decomposition agent.**  
-Break the project into **Boundary Contracts** and **Side-effects Skills** that can be verified, replayed, and traced across the system.
+Break the project into **Boundary Contracts** that can be verified, replayed, and traced across the system.  
+The resulting artifacts must be sufficient for a human or LLM to re-implement the system without source code.
 
 ---
 
 ## 🎯 Objective
 
-Output a **Boundary Index** and per-boundary **Skill Contracts** such that each boundary:
+Output a **Boundary Index** and per-boundary **Contract Documents** such that each boundary:
 
 1. Owns a **canonical identity** (`subject_id`, `dedupe_key`, `idempotency_scope`)
 2. Declares **all dependencies** (pure or impure)
@@ -18,68 +19,59 @@ Output a **Boundary Index** and per-boundary **Skill Contracts** such that each 
 5. Classifies outcomes as **PASS / SOFT_FAIL / HARD_FAIL**
 6. States **security / PII surface and redaction rules**
 7. Names an **owner** (team or person)
-8. Declares **inter-boundary relationships** — events, state models, tenancy, observability, and rollback plans
-
-Perform this decomposition in **three phases:**
-
-| Phase | Scope | Output |
-|-------|--------|--------|
-| **1** | Backend / System boundaries | `BOUNDARY_INDEX.csv` |
-| **2** | UI → API integration boundaries | `BOUNDARY_UI.csv` (or `layer=ui`) |
-| **3** | DevOps / Infrastructure (Terraform, CI/CD, observability) boundaries | `BOUNDARY_INFRA.csv` (or `layer=infra`) |
+8. Declares **inter-boundary relationships** — events, state models, tenancy, observability, rollback
+9. Links to **implementation-completing artifacts** (schemas, OpenAPI, DDL, state machines, runbooks)
 
 ---
 
 ## 🧩 Three-Phase Decomposition
 
-### **Phase 1 — Backend / System Boundaries**
-
-Identify every backend effect surface (DB, event, cache, file, external API).  
-Generate the core `BOUNDARY_INDEX.csv` and per-skill folders.
-
----
-
-### **Phase 2 — UI → API Integration Boundaries**
-
-Model each **user-triggered API call** as a boundary linking the frontend to its backend contract.
-
-*(same structure as before — unchanged except inherits new inter-boundary columns if merged into master index)*
+| Phase | Scope | Output |
+|-------|--------|--------|
+| **1** | Backend / System boundaries | `BOUNDARY_INDEX.csv` |
+| **2** | UI → API integration boundaries | `BOUNDARY_UI.csv` (or `layer=ui`) |
+| **3** | DevOps / Infrastructure (Terraform, CI/CD, observability) | `BOUNDARY_INFRA.csv` (or `layer=infra`) |
 
 ---
 
-### **Phase 3 — DevOps / Infrastructure Boundaries**
+## 🧱 Inter-Boundary Layer
 
-Treat each provisioning, deployment, or CI workflow as a boundary.  
-*(same as v2.3 — unchanged except inter-boundary additions apply)*
-
----
-
-## 🧱 Inter-Boundary Layer (new in v2.4)
-
-This layer captures the *relationships between boundaries* — the connective tissue that forms system-level coherence.
+Defines the *relationships between boundaries* — the system’s connective tissue.
 
 | Section | Purpose | Example Columns |
 |----------|----------|----------------|
-| **Event Map** | Declare emitted and consumed events | `event_emits`, `event_consumes`, `schema_ref` |
+| **Event Map** | Declare emitted/consumed events | `event_emits`, `event_consumes`, `schema_ref` |
 | **State Model Ref** | Link to domain state chart | `state_model_ref=email.state.md` |
 | **Tenancy & AuthZ** | Clarify security domain | `tenancy_scope=USER`, `authz_policy_ref=policy_user.yaml` |
 | **Observability** | Bind to metrics and alerts | `observability_metric=sb_request_latency_ms`, `alert_rule=error_rate>1%` |
 | **Rollback Plan** | Reference remediation path | `rollback_ref=runbooks/rollback_ingest.md` |
-| **Cache / Consistency** | Express coherence rules | `cache_keys=family:{id}`, `consistency_rule=window<=5s` |
-| **Data Retention** | Define how long artifacts persist | `data_retention=emails.raw:30d` |
+| **Cache / Consistency** | Express coherence rules | `cache_keys=family:{id}` |
+| **Data Retention** | Define artifact lifetimes | `data_retention=emails.raw:30d` |
 
-Every boundary must emit or consume versioned events from a single source of truth file:  
-`BOUNDARY_EVENTS.csv` (the event catalog).
+Every boundary must reference versioned events listed in the single source of truth:  
+`BOUNDARY_EVENTS.csv`.
 
 ---
 
-## 📋 Deliverables
+## 🧩 Implementation-Completing Artifacts (ICA-12)
 
-1. **Phase 1** → `BOUNDARY_INDEX.csv`  
-2. **Phase 2** → `BOUNDARY_UI.csv` (or merged into master)  
-3. **Phase 3** → `BOUNDARY_INFRA.csv` (or merged into master)  
-4. **Event Catalog** → `BOUNDARY_EVENTS.csv` (inter-boundary spine)  
-5. **Optional** → `STATE_MODELS/` folder with `.md` diagrams for each entity
+To enable LLM or human re-implementation, include these top-level specs:
+
+| Artifact | Purpose |
+|-----------|----------|
+| `openapi.yaml` | API surface, request/response schemas, error envelopes |
+| `db/ddl.sql` + `migrations/*.sql` | Canonical schema for persistent state |
+| `schemas/api/*.json` + `schemas/events/*.json` | Typed payload definitions |
+| `BOUNDARY_EVENTS.csv` | Event producers/consumers + schemas |
+| `auth/policies/*.yaml` | Roles, scopes, token formats |
+| `state_models/*.md` or `*.ts` | Executable state machines |
+| `observability/metrics.yaml`, `alerts.yaml` | Metrics + SLO bindings |
+| `infra/docker-compose.yml`, `Taskfile.yml` | Build/run envelope |
+| `seed/*.json` | Sample data for deterministic replay |
+| `ui/contract/*.md` + `ui/tests/*.spec.ts` | Frontend integration contracts |
+| `runbooks/*.md` | Rollback / recovery procedures |
+
+Together with the boundary CSVs, these define 100 % of the system’s operational truth.
 
 ---
 
@@ -93,7 +85,7 @@ name,layer,intent,subject_id,dedupe_key,idempotency_scope,inputs,dependencies,ef
 
 ---
 
-## 🧾 SKILL.md Schema (v2.4)
+## 📘 BOUNDARY.md Schema (replaces SKILL.md)
 
 ```yaml
 ---
@@ -102,7 +94,6 @@ summary: <one-sentence outcome>
 
 applies_to: ["intent:<verb_noun>", "domain:<domain>"]
 layer: backend|ui|infra
-
 owner: <team_or_person>
 runner: <module_or_service>
 criticality: LOW|MED|HIGH
@@ -141,6 +132,7 @@ events:
     - { name: email_ingested.v1, key: subject_id, schema_ref: schema://events/email_ingested.v1.json }
   consumes:
     - { name: extraction_ready.v1, schema_ref: schema://events/extraction_ready.v1.json }
+
 state_model_ref: email.state.md
 tenancy_scope: GLOBAL|FAMILY|USER|CHILD
 authz_policy_ref: policies/auth_user.yaml
@@ -170,16 +162,17 @@ htk:
 
 ---
 
-## 🧩 Required Outputs
+## 🧾 Required Outputs
 
-| Output                | Purpose                   |
-| --------------------- | ------------------------- |
-| `BOUNDARY_INDEX.csv`  | Backend/system boundaries |
-| `BOUNDARY_UI.csv`     | UI→API contracts          |
-| `BOUNDARY_INFRA.csv`  | Infra/DevOps contracts    |
-| `BOUNDARY_EVENTS.csv` | Event graph spine         |
-| `STATE_MODELS/*.md`   | Domain state machines     |
-| Per-boundary folder   | Skill + kernel + tests    |
+| Output                                       | Purpose                               |
+| -------------------------------------------- | ------------------------------------- |
+| `BOUNDARY_INDEX.csv`                         | Backend/system boundaries             |
+| `BOUNDARY_UI.csv`                            | UI → API contracts                    |
+| `BOUNDARY_INFRA.csv`                         | Infra/DevOps boundaries               |
+| `BOUNDARY_EVENTS.csv`                        | Event graph spine                     |
+| `STATE_MODELS/*.md`                          | Domain state machines                 |
+| `BOUNDARY.md` per boundary                   | Human-readable contract               |
+| Implementation-completing artifacts (ICA-12) | Schemas, OpenAPI, DDL, runbooks, etc. |
 
 ---
 
@@ -201,17 +194,29 @@ htk:
 * **Observability is part of the contract.**
 * **Rollback is documented, not improvised.**
 * **Cache coherence and retention are explicit, not tribal.**
+* **Schemas and OpenAPI close the loop for re-implementation.**
 
 ---
 
 ### ✅ Summary
 
-Your boundaries are now:
+With v2.5, the Boundary System is:
 
-* **Traceable** → every effect has a `subject_id`.
-* **Timed** → every boundary has SLA + retry + timeout.
-* **Connected** → events/states/tenancy link them into a whole.
-* **Observable** → metrics + alerts defined.
-* **Recoverable** → rollback path named.
-* **Secure** → PII and secrets handled explicitly.
-* **Unified** → Backend + UI + Infra share one taxonomy and verdict model.
+* **Traceable** — every effect has a `subject_id`
+* **Timed** — each boundary defines SLA, retries, timeout
+* **Connected** — events/states/tenancy link the whole
+* **Observable** — metrics + alerts embedded
+* **Recoverable** — rollback paths named
+* **Reconstructable** — schemas + OpenAPI + DDL = full rebuild possible
+* **Unified** — Backend, UI, Infra share one taxonomy and verdict model
+
+```
+
+---
+
+**Why “BOUNDARY.md”**  
+- It conveys contract scope, not agent capability.  
+- Matches your CSV naming (`BOUNDARY_INDEX.csv`).  
+- Reads naturally in repos: `boundaries/ingest-email/BOUNDARY.md`.
+
+This version is implementation-complete: the CSVs + `BOUNDARY.md` + ICA-12 are sufficient for a model or engineer to regenerate a functional system deterministically.
