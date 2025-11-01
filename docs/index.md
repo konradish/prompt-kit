@@ -4,6 +4,7 @@ This folder collects ready-to-use LLM documents. Copy the template you need, fil
 
 ## Available Documents
 - **focus-htk.md** – Extract the best next action from broad inputs using FOCUS + Hypothesis→Test Kernel. Works across software, troubleshooting, and life logistics.
+- **claude-code-features.md** – Choose between slash commands, skills, subagents, MCP servers, and hooks using a compositional playbook.
 - **project-kickoff.md** – Frame new tasks with goals, constraints, and communication plans.
 - **solution-outline.md** – Summarize how to approach a known problem before writing detailed output.
 - **debugging-playbook.md** – Walk through reproducing, isolating, and fixing issues methodically.
