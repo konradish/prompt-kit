@@ -4,10 +4,11 @@ Lightweight library of reusable LLM-ready documents. Every Markdown file is mean
 
 ## What's inside
 
-- `docs/` – short templates that capture the shape of common workflows (kickoffs, debugging, outlining, writing style, diagramming)
+- `docs/` – short templates that capture the shape of common workflows (kickoffs, debugging, outlining, writing style, diagramming, Claude Code architecture patterns)
+- `architectures/` – longer reference documents for complex system design and multi-step projects
 - `LICENSE` – MIT license for sharing and remixing
 
-Add new documents by dropping a Markdown file into `docs/` and referencing it from `docs/index.md`.
+Add new templates by dropping a Markdown file into `docs/` and referencing it from `docs/index.md`. For longer architecture guides, use `architectures/`.
 
 ## Usage
 
