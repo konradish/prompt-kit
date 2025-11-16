@@ -158,3 +158,41 @@ Next HTK proposed: <short-label> — Why-next (≤2)
 * Always start from a clean working set.
 * Commit even failed **artifacts**, but revert failed **code**.
 * Maintain WIP=1: only one active HTK at a time.
+
+---
+
+## Documentation Sync Obligations
+
+Before marking HTK as PASS, ensure documentation is current:
+
+### Required Updates
+
+1. **Specs Updated**: If architecture changed, update `specs/`
+2. **Docs Updated**: If user-facing behavior changed, update `docs/`
+3. **Skills Updated**: If workflows changed, update `.claude/skills/` or `.claude/commands/`
+4. **Cross-references Validated**: Verify no broken links
+
+### Commit Message Format with Documentation
+
+```
+HTK:<label> — PASS — <metric>
+
+Updated:
+- specs/modules/[module].md (new boundary)
+- docs/api-reference.md (new endpoint)
+- .claude/skills/backend-developer/REFERENCE.md (pattern update)
+```
+
+### Validation Before PASS
+
+Run sync validation to ensure documentation is current:
+
+```bash
+# Check for documentation drift
+/docs/sync-check
+
+# Validate documentation standards
+/docs/enforce-standards
+```
+
+Only mark HTK as PASS after documentation sync is verified.
