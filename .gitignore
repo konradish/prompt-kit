@@ -9,3 +9,22 @@ Thumbs.db
 # Logs or scratch files
 *.log
 notes/
+
+# Claude Code runtime directories (never commit these)
+claude-config/.credentials.json
+claude-config/debug/
+claude-config/file-history/
+claude-config/history.jsonl
+claude-config/projects/
+claude-config/session-env/
+claude-config/shell-snapshots/
+claude-config/todos/
+claude-config/statsig/
+claude-config/local/
+claude-config/plugins/
+claude-config/prompt-packs/
+
+# Settings that may contain local paths or preferences
+claude-config/settings.json
+claude-config/settings.local.json
+claude-config/config/

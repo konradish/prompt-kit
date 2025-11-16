@@ -1,0 +1,269 @@
+{
+  "scan_metadata": {
+    "timestamp": "2025-06-15T08:31:51Z",
+    "scan_duration": "4.2s",
+    "cei_version": "1.0.0"
+  },
+  "system_profile": {
+    "os": "Debian GNU/Linux 12 (bookworm)",
+    "kernel": "5.15.167.4-microsoft-standard-WSL2",
+    "architecture": "x86_64",
+    "environment_type": "WSL2",
+    "cpu": "Intel(R) Core(TM) i9-14900K (32 cores)",
+    "memory_total": "31GB",
+    "memory_available": "27GB",
+    "storage_root": "ext4 - 945GB available",
+    "virtualization": "Microsoft Hyper-V"
+  },
+  "tools": {
+    "available": [
+      {
+        "name": "git",
+        "version": "2.39.5",
+        "location": "/usr/bin/git",
+        "status": "operational",
+        "auth_status": "configured",
+        "user": "Konrad Odell"
+      },
+      {
+        "name": "gh",
+        "version": "2.73.0",
+        "location": "/usr/bin/gh",
+        "status": "operational",
+        "auth_status": "authenticated",
+        "user": "konradish",
+        "scopes": ["gist", "read:org", "repo", "workflow"]
+      },
+      {
+        "name": "docker",
+        "version": "28.1.1",
+        "location": "/usr/bin/docker",
+        "status": "operational",
+        "auth_status": "daemon_accessible"
+      },
+      {
+        "name": "node",
+        "version": "22.15.1",
+        "location": "/home/kodell/.config/nvm/versions/node/v22.15.1/bin/node",
+        "status": "operational",
+        "manager": "nvm"
+      },
+      {
+        "name": "npm",
+        "version": "11.4.1",
+        "location": "/home/kodell/.config/nvm/versions/node/v22.15.1/bin/npm",
+        "status": "operational",
+        "manager": "nvm"
+      },
+      {
+        "name": "python3",
+        "version": "3.12.10",
+        "location": "/home/kodell/.local/share/../bin/python3",
+        "status": "operational",
+        "manager": "uv"
+      },
+      {
+        "name": "uv",
+        "version": "0.7.6",
+        "location": "/home/kodell/.local/share/../bin/uv",
+        "status": "operational",
+        "type": "fast_python_package_manager"
+      },
+      {
+        "name": "uvx",
+        "version": "0.7.6",
+        "location": "/home/kodell/.local/share/../bin/uvx",
+        "status": "operational",
+        "type": "python_app_runner"
+      },
+      {
+        "name": "wrangler",
+        "version": "4.20.0",
+        "location": "/home/kodell/.config/nvm/versions/node/v22.15.1/bin/wrangler",
+        "status": "operational",
+        "manager": "npm"
+      },
+      {
+        "name": "aider",
+        "version": "0.84.0",
+        "location": "/home/kodell/.local/share/../bin/aider",
+        "status": "operational",
+        "manager": "uv",
+        "type": "ai_coding_assistant"
+      },
+      {
+        "name": "repomix",
+        "version": "0.3.8",
+        "location": "/home/kodell/.config/nvm/versions/node/v22.15.1/bin/repomix",
+        "status": "operational",
+        "manager": "npm",
+        "type": "repository_packager"
+      },
+      {
+        "name": "sgpt",
+        "version": "1.4.5",
+        "location": "aliased to uvx --from shell-gpt sgpt",
+        "status": "operational",
+        "manager": "uvx",
+        "type": "shell_gpt"
+      },
+      {
+        "name": "curl",
+        "version": "7.88.1",
+        "location": "/usr/bin/curl",
+        "status": "operational",
+        "type": "system_package"
+      },
+      {
+        "name": "jq",
+        "version": "1.6",
+        "location": "/usr/bin/jq",
+        "status": "operational",
+        "type": "system_package"
+      },
+      {
+        "name": "direnv",
+        "version": "2.32.1",
+        "location": "/usr/bin/direnv",
+        "status": "operational",
+        "type": "system_package"
+      }
+    ],
+    "missing": [
+      {
+        "name": "pip",
+        "status": "not_found",
+        "recommendation": "use uv/uvx instead"
+      }
+    ]
+  },
+  "network": {
+    "connectivity": {
+      "github_api": {
+        "url": "api.github.com",
+        "status": "accessible",
+        "response_code": 200
+      },
+      "npm_registry": {
+        "url": "registry.npmjs.org",
+        "status": "accessible",
+        "response_code": 200
+      },
+      "pypi": {
+        "url": "pypi.org",
+        "status": "accessible",
+        "response_code": 200
+      },
+      "cloudflare_api": {
+        "url": "api.cloudflare.com",
+        "status": "redirects",
+        "response_code": 301,
+        "note": "functional but redirects"
+      }
+    },
+    "limitations": {
+      "ping": "blocked due to missing cap_net_raw+p capability"
+    }
+  },
+  "performance": {
+    "filesystem": {
+      "ext4": {
+        "paths": ["/tmp", "~/"],
+        "write_speed": "3.2GB/s",
+        "read_speed": "11.5GB/s",
+        "recommendation": "use for development work"
+      },
+      "9p": {
+        "paths": ["/mnt/c"],
+        "write_speed": "390MB/s",
+        "read_speed": "415MB/s",
+        "performance_ratio": {
+          "write_penalty": "8.2x slower",
+          "read_penalty": "27.7x slower"
+        }
+      }
+    }
+  },
+  "limitations": [
+    {
+      "category": "security",
+      "severity": "high",
+      "description": "Claude Code restricts directory changes to child directories only",
+      "impact": "Limits git operations and file access patterns",
+      "workaround": "Use absolute paths for commands requiring different directories"
+    },
+    {
+      "category": "performance",
+      "severity": "medium",
+      "description": "9P filesystem significantly slower than ext4",
+      "impact": "8-28x slower file I/O operations",
+      "recommendation": "Use ext4 locations for performance-critical operations"
+    },
+    {
+      "category": "network",
+      "severity": "low",
+      "description": "Ping utility blocked due to missing capabilities",
+      "impact": "Cannot measure network latency directly",
+      "workaround": "Use HTTP requests for connectivity testing"
+    },
+    {
+      "category": "package_management",
+      "severity": "low",
+      "description": "Traditional pip not available",
+      "impact": "Requires adjustment for developers used to pip",
+      "solution": "uv/uvx provides superior performance and functionality"
+    }
+  ],
+  "mounts": {
+    "primary": [
+      {
+        "source": "/dev/sdf",
+        "target": "/",
+        "type": "ext4",
+        "options": "rw,relatime,discard,errors=remount-ro,data=ordered"
+      }
+    ],
+    "symlinks": [
+      {
+        "source": "~/projects",
+        "target": "/mnt/c/projects",
+        "status": "accessible"
+      },
+      {
+        "source": "~/.aws",
+        "target": "/mnt/c/Users/konra/.aws",
+        "status": "accessible"
+      },
+      {
+        "source": "~/.azure",
+        "target": "/mnt/c/Users/konra/.azure",
+        "status": "accessible"
+      },
+      {
+        "source": "~/LLM",
+        "target": "/mnt/c/LLM",
+        "status": "accessible"
+      }
+    ]
+  },
+  "summary": {
+    "status": "development_ready",
+    "confidence": "high",
+    "environment_score": 8.7,
+    "critical_issues": 0,
+    "warnings": 4,
+    "strengths": [
+      "Comprehensive development toolchain available",
+      "GitHub and Docker authentication configured",
+      "High-performance ext4 filesystem for development",
+      "Modern Python tooling (uv/uvx)",
+      "AI development tools installed"
+    ],
+    "key_limitations": [
+      "Claude Code directory access restrictions",
+      "9P filesystem performance penalty",
+      "Network ping capabilities blocked",
+      "Traditional pip unavailable"
+    ]
+  }
+}
