@@ -199,6 +199,11 @@ docs/
 │   ├── first-project.md              # Hello World example
 │   └── common-patterns.md            # Top 5 patterns
 ├── workflows/
+│   ├── boundary-decomposition/       # ⭐ FLAGSHIP: LLM-native architecture
+│   │   ├── README.md                # Overview and positioning
+│   │   ├── methodology.md           # Protocol v2.6 (unified CSV)
+│   │   ├── comparison-to-industry.md  # vs Backstage, OpenAPI, C4
+│   │   └── when-to-use.md           # Decision guide
 │   ├── htk-methodology.md            # (moved from focus-htk.md)
 │   ├── riper-workflow.md             # NEW: Research→Execute
 │   ├── tdd-workflow.md               # NEW: Test-driven development
@@ -259,6 +264,12 @@ examples/
 │   └── monorepo/
 │       └── ...
 ├── workflows/
+│   ├── boundary-decomposition/       # ⭐ FLAGSHIP EXAMPLE
+│   │   └── email-app/               # Complete working example
+│   │       ├── BOUNDARY_INDEX.csv   # 7 boundaries (backend/frontend/infra)
+│   │       ├── BOUNDARY_EVENTS.csv  # 3 events
+│   │       ├── STATE_MODELS/
+│   │       └── README.md            # Full walkthrough
 │   ├── htk-complete-example/
 │   │   ├── hypothesis.md
 │   │   ├── test-plan.md
@@ -345,28 +356,44 @@ examples/
 
 **New workflow documentation** (in `docs/workflows/`):
 
-1. **RIPER Workflow** (`riper-workflow.md`)
+1. **Boundary Decomposition** (`boundary-decomposition/`) — ⭐ **FLAGSHIP WORKFLOW**
+   - Methodology: Contract-first system design (v2.6 unified CSV)
+   - Comparison: How it relates to industry standards (Backstage, OpenAPI, C4)
+   - When to use: Decision guide for applying boundary contracts
+   - Complete example: Email app with 7 boundaries (backend, frontend, infra)
+   - **Positioning**: "LLM-native architecture documentation"
+   - **Unique value**: Synthesizes service catalogs + API contracts + dependency mapping
+
+2. **HTK Methodology** (`htk-methodology.md`) — moved from root level
+   - Hypothesis → Test Kernel approach
+   - Experiment directory structure
+   - Token measurement and validation
+   - Integration with other workflows
+
+3. **RIPER Workflow** (`riper-workflow.md`)
    - Research phase: Context gathering
    - Innovate phase: Solution ideation
    - Plan phase: Detailed specification
    - Execute phase: Implementation
    - Review phase: Quality validation
 
-2. **TDD Workflow** (`tdd-workflow.md`)
+4. **TDD Workflow** (`tdd-workflow.md`)
    - Write failing tests
    - Implement minimal solution
    - Refactor with confidence
    - Example session walkthrough
+   - Integration with boundary contracts
 
-3. **Spec-Plan-Task Workflow** (`spec-plan-task.md`)
+5. **Spec-Plan-Task Workflow** (`spec-plan-task.md`)
    - Single-file approach
    - Integration with GitHub issues
    - Example template
 
-4. **Security Audit Workflow** (`security-audit-workflow.md`)
+6. **Security Audit Workflow** (`security-audit-workflow.md`)
    - OWASP top 10 checklist
    - Automated scanning
    - Remediation tracking
+   - PII surface analysis (from boundary protocol)
 
 ### Phase 5: Global Config Enhancements
 
