@@ -1,15 +1,15 @@
-# 🧠 Prompt: Universal Boundary Decomposition v2.5 (Tests Optional)
+# 🧠 Prompt: Universal Boundary Decomposition v2.6 (Unified CSV, Tests Optional)
 
 *(for any project — pure, coupled, infra-heavy, or mixed)*
 
-You are an **engineering decomposition agent.**  
+You are an **engineering decomposition agent.**
 Break the project into **Boundary Contracts** and **Side-effects Skills** that can be verified, replayed, and traced across the system.
 
 ---
 
 ## 🎯 Objective
 
-Output a **Boundary Index** and per-boundary **Skill Contracts** such that each boundary:
+Output a **unified Boundary Index** (single CSV for all layers) and per-boundary **Skill Contracts** such that each boundary:
 
 1. Owns a **canonical identity** (`subject_id`, `dedupe_key`, `idempotency_scope`)
 2. Declares **all dependencies** (pure or impure)
@@ -20,13 +20,15 @@ Output a **Boundary Index** and per-boundary **Skill Contracts** such that each 
 7. Names an **owner** (team or person)
 8. Declares **inter-boundary relationships** — events, state models, tenancy, observability, and rollback plans
 
-Perform this decomposition in **three phases:**
+Perform this decomposition in **three phases**, documenting all boundaries in one file:
 
 | Phase | Scope | Output |
 |-------|------|--------|
-| **1** | Backend / System boundaries | `BOUNDARY_INDEX.csv` |
-| **2** | UI → API integration boundaries | `BOUNDARY_UI.csv` (or `layer=ui`) |
-| **3** | DevOps / Infrastructure boundaries | `BOUNDARY_INFRA.csv` (or `layer=infra`) |
+| **1** | Backend / System boundaries | Add to `BOUNDARY_INDEX.csv` with `layer=backend` |
+| **2** | Frontend / UI boundaries | Add to `BOUNDARY_INDEX.csv` with `layer=frontend` |
+| **3** | DevOps / Infrastructure boundaries | Add to `BOUNDARY_INDEX.csv` with `layer=infra` |
+
+> **Unified CSV approach:** All boundaries (backend, frontend, infra) in one `BOUNDARY_INDEX.csv` with a `layer` column. This simplifies LLM context loading, cross-layer queries, and version control history.
 
 > **Tests are optional.** CSVs are the source of truth; skills and tests are generated **only when justified** (see *Test-on-Demand*).
 
@@ -46,12 +48,10 @@ Maintain a single event catalog: `BOUNDARY_EVENTS.csv`.
 
 ## 📋 Deliverables
 
-1. `BOUNDARY_INDEX.csv`
-2. `BOUNDARY_UI.csv` (or merged with `layer=ui`)
-3. `BOUNDARY_INFRA.csv` (or merged with `layer=infra`)
-4. `BOUNDARY_EVENTS.csv` (event spine)
-5. `STATE_MODELS/*.md` (tiny charts)
-6. **Optional / On-Demand:** per-boundary skill folders and tests
+1. `BOUNDARY_INDEX.csv` — **Unified boundary catalog** with all layers (backend, frontend, infra)
+2. `BOUNDARY_EVENTS.csv` — **Event catalog** (global event spine)
+3. `STATE_MODELS/*.md` — **State machines** (tiny charts for key entities)
+4. **Optional / On-Demand:** per-boundary skill folders and tests (only when justified by criticality/complexity)
 
 ---
 
@@ -65,13 +65,13 @@ name,layer,intent,subject_id,dedupe_key,idempotency_scope,inputs,dependencies,ef
 
 ---
 
-## 🧾 SKILL.md Schema (v2.5) — **tests optional**
+## 🧾 SKILL.md Schema (v2.6) — **tests optional**
 
 ```yaml
 ---
 name: <slug>
 summary: <one-sentence outcome>
-layer: backend|ui|infra
+layer: backend|frontend|infra
 applies_to: ["intent:<verb_noun>", "domain:<domain>"]
 
 owner: <team_or_person>
@@ -186,6 +186,42 @@ When triggered, generate the minimal viable set:
 * 1 negative/soft-fail (retryable) case
 
 Everything else remains spec-only.
+
+---
+
+## 📊 Why Unified CSV? (v2.6 Change)
+
+**Previous approach** (v2.5): Three separate CSVs
+- `BOUNDARY_INDEX.csv` (backend only)
+- `BOUNDARY_UI.csv` (frontend)
+- `BOUNDARY_INFRA.csv` (infrastructure)
+
+**New approach** (v2.6): Single CSV with `layer` column
+
+**Benefits**:
+1. **LLM Context Efficiency**: Load one file instead of three
+2. **Cross-Layer Queries**: `grep "layer=frontend" BOUNDARY_INDEX.csv` finds all frontend boundaries
+3. **Simpler Git History**: Track evolution in one file's history
+4. **Easier Maintenance**: Single header schema to version
+5. **Better Relationships**: Query cross-layer dependencies easily (e.g., "which frontend boundaries depend on email-ingest backend?")
+6. **Consistent Tooling**: One parser, one validator, one linter
+
+**Example Queries**:
+```bash
+# All HIGH criticality boundaries across all layers
+awk -F',' '$NF=="HIGH"' BOUNDARY_INDEX.csv
+
+# Backend boundaries that emit events
+grep "layer=backend" BOUNDARY_INDEX.csv | grep -v "event_emits=$"
+
+# Frontend boundaries depending on specific backend API
+grep "layer=frontend" BOUNDARY_INDEX.csv | grep "email-api"
+
+# Infrastructure boundaries with observability gaps
+grep "layer=infra" BOUNDARY_INDEX.csv | grep "observability_metric=$"
+```
+
+**CSV remains optimal for LLM consumption**: Structured, diffable, queryable, token-efficient.
 
 ---
 
