@@ -15,16 +15,14 @@ claude-config/
 │   ├── analysis/               # Code analysis commands
 │   ├── core/                   # Core utility commands
 │   ├── documentation/          # Documentation commands
-│   ├── evaluation/             # Evaluation and testing commands
 │   ├── htk/                    # HTK workflow commands
 │   │   ├── focus.md           # Generate FOCUS options
 │   │   ├── create.md          # Create single HTK
 │   │   ├── plan.md            # Build HTK pipeline
 │   │   ├── run-next.md        # Execute next HTK
 │   │   └── summarize.md       # Rollup and replan
-│   ├── orchestration/         # Parallel execution commands
-│   │   └── parallel-exec.md   # Run multiple tasks concurrently
-│   └── workspace/              # Workspace management commands
+│   └── orchestration/         # Parallel execution commands
+│       └── parallel-exec.md   # Run multiple tasks concurrently
 ├── hooks/                       # Event hooks
 │   └── claude-tts-notify.py   # Example notification hook
 ├── settings.json.template       # Template for settings.json

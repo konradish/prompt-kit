@@ -29,5 +29,8 @@ claude-config/settings.json
 claude-config/settings.local.json
 claude-config/config/
 
+# Workspace scan outputs (generated artifacts)
+claude-config/commands/workspace/scan-env-*/
+
 # Project .claude local overrides (personal settings)
 .claude/settings.local.json
