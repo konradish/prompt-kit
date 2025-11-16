@@ -8,6 +8,20 @@ This file contains global instructions that Claude Code will follow across all p
 - Don't work around failures by using placeholders, ask the user first
 - **Subshell PATH Issues**: When using commands that execute strings in a subshell (e.g., `bash -c "..."`, `asciinema rec -c "..."`), aliases from `.zshrc` or `.bashrc` will not be available. Always use the absolute path to executables inside these commands. Use `which <command>` to find the path before constructing the subshell command.
 
+## Development Philosophy
+
+- Prefer explicit over implicit
+- Test-driven development for all features
+- Progressive disclosure in documentation
+- Security-first approach (tenant isolation, auth)
+
+## Quality Standards
+
+- CLAUDE.md files: < 100 lines
+- SKILL.md files: < 500 lines
+- REFERENCE.md files: < 600 lines
+- Use progressive disclosure pattern
+
 ## Project-Specific Configurations
 
 Add your own project-specific configurations below. Examples:

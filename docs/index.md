@@ -11,6 +11,7 @@ This folder collects ready-to-use LLM documents. Copy the template you need, fil
 - **debugging-playbook.md** – Walk through reproducing, isolating, and fixing issues methodically.
 
 ### Claude Code Architecture
+- **claude-code-best-practices.md** – **NEW 2025-11-16**: Comprehensive guide to skills vs agents, global vs project configuration, progressive disclosure, file size standards, and coordination patterns. The authoritative reference for Claude Code organization.
 - **claude-code-features.md** – Choose between slash commands, skills, subagents, MCP servers, and hooks using a compositional playbook.
 - **claude-code-docs-pattern.md** – **NEW 2025-11-16**: Reusable template for organizing `.claude/` directory structure with skills, commands, and agents. Includes progressive disclosure, file size constraints, and lock-in mitigation strategies.
 - **claude-knowledge-architecture.md** – Structure modular .claude/ knowledge systems for token efficiency.
