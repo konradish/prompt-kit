@@ -28,3 +28,6 @@ claude-config/prompt-packs/
 claude-config/settings.json
 claude-config/settings.local.json
 claude-config/config/
+
+# Project .claude local overrides (personal settings)
+.claude/settings.local.json

@@ -7,11 +7,23 @@ This directory becomes your `~/.claude` directory via symlink when you run the s
 ```
 claude-config/
 ├── CLAUDE.md                    # Global instructions for all projects
+├── skills/                      # Global skills
+│   └── htk-workflow/           # HTK (Hypothesis → Test Kernel) workflow
+│       ├── SKILL.md            # Core HTK workflow (< 500 lines)
+│       └── REFERENCE.md        # Detailed patterns (< 600 lines)
 ├── commands/                    # Custom slash commands
 │   ├── analysis/               # Code analysis commands
 │   ├── core/                   # Core utility commands
 │   ├── documentation/          # Documentation commands
 │   ├── evaluation/             # Evaluation and testing commands
+│   ├── htk/                    # HTK workflow commands
+│   │   ├── focus.md           # Generate FOCUS options
+│   │   ├── create.md          # Create single HTK
+│   │   ├── plan.md            # Build HTK pipeline
+│   │   ├── run-next.md        # Execute next HTK
+│   │   └── summarize.md       # Rollup and replan
+│   ├── orchestration/         # Parallel execution commands
+│   │   └── parallel-exec.md   # Run multiple tasks concurrently
 │   └── workspace/              # Workspace management commands
 ├── hooks/                       # Event hooks
 │   └── claude-tts-notify.py   # Example notification hook
@@ -35,11 +47,22 @@ This creates a symlink `~/.claude` → `claude-config/`, making this directory y
 
 Global instructions that Claude Code reads before every session. Use this for:
 - Project-agnostic preferences (e.g., "use uv for Python")
-- Common deployment workflows
-- Server configurations
+- Development philosophy (TDD, progressive disclosure)
+- Quality standards (file size limits)
 - General coding standards
 
 **Security note:** Don't include passwords, API keys, or personal paths. Use placeholders or examples.
+
+### skills/
+
+Global skills that work across ALL your projects. Currently includes:
+
+**htk-workflow**: Hypothesis-driven development methodology
+- Auto-activates on "hypothesis", "test if", "experiment" keywords
+- Guides systematic testing with minimal changes
+- Clear pass/fail criteria
+- Git version hygiene (keep main branch green)
+- See `skills/htk-workflow/SKILL.md` for details
 
 ### commands/
 

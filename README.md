@@ -7,6 +7,13 @@ Lightweight library of reusable LLM-ready documents and Claude Code configuratio
 - `docs/` – short templates that capture the shape of common workflows (kickoffs, debugging, outlining, writing style, diagramming, Claude Code architecture patterns)
 - `architectures/` – longer reference documents for complex system design and multi-step projects
 - `claude-config/` – version-controlled Claude Code configuration (global instructions, slash commands, hooks)
+  - `skills/htk-workflow/` – HTK (Hypothesis → Test Kernel) workflow for systematic experimentation
+  - `commands/htk/` – HTK commands (/htk-focus, /htk-create, /htk-plan, /htk-run-next, /htk-summarize)
+  - `commands/orchestration/` – Parallel execution utilities
+- `.claude/` – project-specific Claude Code configuration for prompt-kit
+  - `skills/docs-curator/` – Documentation management for this repository
+  - `commands/docs/` – Doc validation and cross-reference checking
+- `experiments/` – HTK experiment artifacts (hypotheses, results, learnings from testing new patterns)
 - `LICENSE` – MIT license for sharing and remixing
 
 Add new templates by dropping a Markdown file into `docs/` and referencing it from `docs/index.md`. For longer architecture guides, use `architectures/`.
@@ -39,9 +46,15 @@ This will:
 
 **What gets version controlled:**
 - `CLAUDE.md` - Global instructions for Claude Code
-- `commands/` - Custom slash commands
+- `skills/` - Global skills (htk-workflow)
+- `commands/` - Custom slash commands (analysis, core, htk, orchestration)
 - `hooks/` - Event hooks (sanitized)
 - `settings.json.template` - Settings template
+
+**New capabilities:**
+- **HTK Workflow** - Auto-activates on "hypothesis", "test if", "experiment" for systematic development
+- **Parallel Execution** - Run multiple independent commands concurrently with `/parallel-exec`
+- **Documentation Curation** - Project-specific skill for managing prompt-kit docs
 
 **What's gitignored (stays local):**
 - `settings.json` - Your personal settings

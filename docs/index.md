@@ -15,6 +15,7 @@ This folder collects ready-to-use LLM documents. Copy the template you need, fil
 - **claude-code-features.md** – Choose between slash commands, skills, subagents, MCP servers, and hooks using a compositional playbook.
 - **claude-code-docs-pattern.md** – **NEW 2025-11-16**: Reusable template for organizing `.claude/` directory structure with skills, commands, and agents. Includes progressive disclosure, file size constraints, and lock-in mitigation strategies.
 - **claude-knowledge-architecture.md** – Structure modular .claude/ knowledge systems for token efficiency.
+- **focus-htk.md** – FOCUS + HTK protocol for hypothesis-driven development. Implemented as global skill in `~/.claude/skills/htk-workflow/`.
 - **smart-claude-context-template.md** – Build CLAUDE.md with selective context loading.
 - **knowledge-module-template.md** – Template for individual knowledge modules in .claude/.
 - **agent-delegation-pattern.md** – Multi-agent workflows for specialized, token-efficient execution.
