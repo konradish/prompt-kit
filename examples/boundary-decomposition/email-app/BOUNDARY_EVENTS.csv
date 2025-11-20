@@ -1,0 +1,4 @@
+event_name,version,schema_ref,key,producers,consumers,orphan,retention_days,description
+email.ingested.v1,1,schemas/email-ingested.json,message_id,email-ingest,email-worker,false,90,Email successfully ingested into system
+email.sent.v1,1,schemas/email-sent.json,draft_id,email-send,email-worker,false,365,Email successfully sent via SMTP
+deployment.applied.v1,1,schemas/deployment-applied.json,deployment_name,k8s-email-api,,true,30,Kubernetes deployment successfully applied
