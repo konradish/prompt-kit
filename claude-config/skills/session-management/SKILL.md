@@ -1,265 +1,307 @@
 ---
 name: session-management
-description: Auto-activates after ~50 messages to suggest parking session and linking related knowledge. Triggers on "park", "session", "compress", "knowledge capture".
-allowed-tools: Read, Write, Glob, Bash
+description: Auto-activates on "park", "session", "remind", "link", "health" keywords. Manages conversation sessions for institutional knowledge capture through park documents, spaced repetition, and knowledge graphs.
+allowed-tools: Read, Write, Glob, Bash, Grep
 ---
 
 # Session Management Skill
 
-Manages conversation sessions for institutional knowledge capture through compressed park documents.
+Manages conversation sessions for institutional knowledge capture through compressed park documents, spaced repetition lessons, and semantic knowledge graphs.
 
 ## Purpose
 
 This skill helps maintain institutional memory by:
-1. Detecting when conversation context is growing large
-2. Suggesting session parking at natural breakpoints
-3. Linking related park documents from previous sessions
-4. Facilitating knowledge reuse across sessions
+1. Detecting when context is growing large → Suggest parking
+2. Capturing lessons with spaced repetition scheduling
+3. Building knowledge graph of related sessions
+4. Tracking action items with SLO deadlines
+5. Surfacing relevant past work for current tasks
 
 ## Auto-Activation Triggers
 
-**Keyword-based:**
-- User mentions: "park", "session", "compress", "knowledge capture"
-- User runs: `/session/park`, `/session/apply`, `/session/note`
+### Keyword Triggers
+- **Parking:** "park", "wrap up", "save session", "compress"
+- **Review:** "remind", "lessons", "what did I learn"
+- **Search:** "link", "related sessions", "find past"
+- **Health:** "health", "metrics", "flywheel status"
+- **Notes:** "note", "capture this", "remember"
 
-**Context-based (approximate):**
-- After ~50 messages in conversation
-- When task completion is reached
-- When switching between unrelated tasks
+### Context-Aware Triggers (Smart Auto-Park)
+
+**Suggest parking when 2+ conditions met:**
+
+| Condition | Threshold | Detection |
+|-----------|-----------|-----------|
+| Message count | >= 40 | Count user/assistant turns |
+| Task completion | Detected | See signals below |
+| Topic drift | 3+ | Unrelated tool calls in sequence |
+| Context usage | >= 80% | Approaching window limit |
+| Time elapsed | >= 2 hours | Session duration |
+| Decision count | >= 5 | Architectural choices made |
+
+**Task Completion Signals:**
+- "done", "working now", "that's it", "ship it"
+- "looks good", "perfect", "that works"
+- "moving on", "next task", "what's next"
+- "let's commit", "ready to merge"
+
+**Force Triggers (Always Suggest):**
+- "ready to park"
+- "let's wrap up"
+- "save this session"
+- "park and commit"
 
 ## Core Workflows
 
-### Workflow 1: Suggest Parking
+### Workflow 1: Proactive Park Suggestion
 
-**When to suggest:**
-- Conversation has ~50+ messages
-- Major task just completed
-- About to switch to unrelated topic
-- User asks "what should I do next?"
-
-**How to suggest:**
-```markdown
-This conversation has grown to [X] messages. Would you like to park this session?
-
-Running `/session/park` will:
-- Compress conversation into AI-optimized summary
-- Capture architectural decisions and lessons learned
-- Identify .claude improvements for future sessions
-- Create park document in .claude-sessions/
-
-Related park documents:
-- [YYYY-MM-DD-topic]: [brief relevance]
-```
-
-### Workflow 2: Link Related Sessions
-
-**When to link:**
-- User starts task similar to past session
-- User encounters issue solved before
-- User requests background on topic
-
-**How to link:**
-1. Search `.claude-sessions/` for relevant park documents
-2. Use Grep to find related topics/keywords
-3. Present 2-3 most relevant with brief context
-4. Offer to load full park document if needed
-
-**Example:**
-```markdown
-Related sessions on authentication:
-- 2025-11-15-oauth-flow: Implemented Google OAuth with redirect handling
-- 2025-11-12-jwt-tokens: Fixed token expiration issue
-- 2025-11-10-auth-testing: Added Claude test user for production
-
-Would you like me to load details from any of these sessions?
-```
-
-### Workflow 3: Facilitate Session Notes
-
-**When user makes important observation:**
-- Suggest: "Would you like to capture this as a session note?"
-- Guide: "Run `/session/note [your observation]`"
-- Context: "This will be incorporated when you park the session"
-
-## Park Document Format (Reference)
-
-Park documents use AI-optimized compression:
+**When 2+ auto-park conditions detected:**
 
 ```markdown
-# [Topic] - YYYY-MM-DD
+📦 This session has grown substantial:
+- Messages: 45
+- Decisions made: 3
+- Time elapsed: 1.5 hours
 
-## Context
-[2-3 sentences: goal and trigger]
+Would you like to park before continuing?
 
-## Decisions
-- **[Decision]**: [Rationale + specifics]
+**Captured so far:**
+- 3 architectural decisions
+- 2 bug fixes
+- 1 efficiency improvement
 
-## Implementation
-- Changed [file]: [what and why]
-- Fixed [bug]: [root cause → solution]
-
-## Lessons
-- ✅ [What worked]
-- ❌ [What didn't]
-- 💡 [Key insight]
-
-## Knowledge Gaps
-- Missing: [docs/tools]
-- Unclear: [patterns]
-
-## .claude Improvements
-- [ ] Add skill: [name]
-- [ ] Add command: [name]
-- [ ] Update CLAUDE.md: [addition]
-
-## Related Sessions
-- [YYYY-MM-DD-topic]: [relation]
+Run `/session:park` to capture, or continue working.
 ```
 
-## Integration with Commands
+### Workflow 2: Session Start Check
 
-This skill coordinates three commands:
+**At session start, proactively check:**
 
-1. **`/session/park`**
-   - Compresses conversation into park document
-   - Saves to `.claude-sessions/YYYY-MM-DD-[topic]-compressed.md`
-   - Incorporates any notes from `/session/note`
+1. **Overdue action items:**
+   ```markdown
+   ⚠️ You have 2 overdue action items:
+   - Add OAuth skill (4 days overdue)
+   - Update CLAUDE.md (1 day overdue)
 
-2. **`/session/apply`**
-   - Reads park documents from last 7 days
-   - Extracts `.claude` improvement suggestions
-   - Auto-applies to skills/commands/docs
+   Address these first? Or continue with new task?
+   ```
 
-3. **`/session/note`**
-   - Quick timestamped note to `current-session-notes.md`
-   - Accumulated during session for park processing
+2. **Lessons due for review:**
+   ```markdown
+   📚 3 lessons due for review. Quick refresher?
+   Run `/session:remind` or skip to your task.
+   ```
 
-## Search Strategy
+3. **Related past sessions:**
+   ```markdown
+   🔗 Found related sessions for "[current topic]":
+   - 2025-11-15-oauth-flow
+   - 2025-11-12-jwt-tokens
 
-**Finding related park documents:**
+   Load context? Run `/session:link [topic]`
+   ```
 
-```bash
-# Search by topic keywords
-grep -l "authentication\|oauth" .claude-sessions/*-compressed.md
+### Workflow 3: Context-Aware Linking
 
-# Search by file paths
-grep -l "backend/app/api/v1/auth" .claude-sessions/*-compressed.md
+**When user starts task similar to past session:**
 
-# Search by date range (last 7 days)
-find .claude-sessions/ -name "*-compressed.md" -mtime -7
+1. Detect topic from user's description
+2. Search knowledge graph for related entities
+3. Present 2-3 most relevant sessions
+4. Offer to load context
 
-# Search by specific lesson learned
-grep -A 3 "Lessons" .claude-sessions/*-compressed.md | grep "OAuth"
+```markdown
+🔗 This looks related to past work on "authentication":
+
+- 2025-11-15-oauth-flow: OAuth redirect handling
+- 2025-11-12-jwt-tokens: Token refresh logic
+
+Load any of these for context?
 ```
 
-## Best Practices
+### Workflow 4: Lesson Reinforcement
 
-### When to Park
-- ✅ Task completed successfully
-- ✅ After 50+ messages
-- ✅ Before switching topics
-- ✅ Found important insights to preserve
+**When user encounters similar situation to past lesson:**
 
-### When NOT to Park
-- ❌ Task incomplete with errors
-- ❌ In middle of debugging
-- ❌ Conversation < 20 messages
-- ❌ No significant decisions made
+1. Match current task keywords against lesson-index
+2. Surface relevant lesson proactively
+3. Ask if it was helpful (updates spaced repetition)
 
-### Compression Guidelines
-- **Preserve:** Architecture decisions, bug root causes, config values
-- **Discard:** Redundant outputs, intermediate debugging, pleasantries
-- **Target:** Dense, technical, < 500 lines
-- **Format:** AI-optimized (freeform but structured)
+```markdown
+💡 Relevant lesson from 2025-11-15:
+"Always verify OAuth state param matches before redirect"
 
-### Linking Relevance
-- **High relevance:** Same component/feature (always suggest)
-- **Medium relevance:** Related pattern/workflow (suggest if < 3 docs)
-- **Low relevance:** Tangential connection (mention only if asked)
+Keep this in mind for the current task.
+```
+
+## Command Integration
+
+This skill coordinates these commands:
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `/session:park` | Create park document | End of session, milestone |
+| `/session:apply` | Process improvements | Weekly, or when prompted |
+| `/session:note` | Quick timestamped note | Capture insight mid-session |
+| `/session:remind` | Review due lessons | Start of session, new task |
+| `/session:health` | View metrics dashboard | Weekly review, debugging |
+| `/session:link <query>` | Search knowledge graph | Starting related work |
+
+## Data Files (Per-Project)
+
+All data stored in `.claude-sessions/`:
+
+| File | Purpose | Updated By |
+|------|---------|------------|
+| `action-items.yaml` | SLO-tracked improvements | `/session:apply` |
+| `lesson-index.yaml` | Spaced repetition lessons | `/session:park` |
+| `knowledge-graph.yaml` | Entity relationships | `/session:park` |
+| `metrics.yaml` | Flywheel health metrics | All commands |
+| `current-session-notes.md` | Running notes | `/session:note` |
+| `*-compressed.md` | Park documents | `/session:park` |
+
+## Behavior Rules
+
+1. **Be proactive but not annoying** - Suggest, don't insist
+2. **Prioritize overdue items** - Surface blockers first
+3. **Link related work** - Help avoid repeated mistakes
+4. **Track everything** - Update metrics consistently
+5. **Respect user focus** - Don't interrupt deep work unnecessarily
+
+## Smart Trigger Detection
+
+### Detecting Topic Drift
+
+Track last 5 tool calls. If 3+ are unrelated to initial task:
+- Different file paths (not in same directory tree)
+- Different entity types (switching from backend to frontend)
+- Unrelated grep patterns
+
+→ Suggest: "Looks like you're switching topics. Park the previous work?"
+
+### Detecting Task Completion
+
+Monitor for completion signals in user messages:
+- Direct statements: "done", "finished", "complete"
+- Satisfaction: "perfect", "that works", "great"
+- Transition: "now let's", "next", "moving on"
+- Commit intent: "commit", "push", "merge", "deploy"
+
+→ Suggest: "Task complete! Park this session to capture learnings?"
+
+### Detecting Decision Density
+
+Count statements that indicate architectural choices:
+- "let's use X instead of Y"
+- "we should go with"
+- "decided to"
+- "the approach will be"
+- Trade-off discussions
+
+→ At 5+ decisions: "Several important decisions made. Good time to park?"
+
+## Proactive Suggestions Format
+
+Keep suggestions brief and actionable:
+
+```markdown
+[Icon] [Brief observation]
+
+[1-2 bullet summary]
+
+[Single action suggestion with command]
+```
+
+**Icons:**
+- 📦 Park suggestion
+- ⚠️ Overdue items
+- 📚 Lessons due
+- 🔗 Related sessions
+- 💡 Relevant lesson
+- ✅ Task complete
+
+## Progressive Disclosure
+
+**This file (SKILL.md):** Core workflows, triggers, commands
+
+**REFERENCE.md:** Detailed schemas, patterns, troubleshooting
+- Load when user asks about data formats
+- Load when debugging issues
+- Load for implementation details
 
 ## Success Metrics
 
-**Good park document:**
-- Contains actionable `.claude` improvements
-- Preserves specific technical details
-- Includes lessons learned
-- References related sessions
-- < 500 lines
-- Dense, not verbose
+**Good session management:**
+- Park suggestion accepted > 60% of time
+- Overdue items < 2 at any time
+- Lessons reviewed on schedule
+- Related sessions discovered proactively
+- Repeated mistakes decreasing month-over-month
 
-**Effective linking:**
-- User avoids repeating solved problems
-- User leverages past architectural decisions
-- User applies learned patterns
-- User requests specific park documents
+**Poor signals:**
+- User dismisses suggestions repeatedly
+- Large backlog of overdue items
+- Same mistakes appearing in multiple sessions
+- Knowledge graph not growing
+
+## Integration with "Park and Commit"
+
+When user says "park and commit":
+
+1. Run `/session:park` workflow
+2. Stage park document: `git add .claude-sessions/*.md`
+3. Stage related YAML files if changed
+4. Include in commit message:
+   ```
+   feat: [main changes]
+
+   Session parked: [topic]
+   - Decisions: N
+   - Lessons: M
+   - Action items: K
+   ```
 
 ## Common Scenarios
 
 ### Scenario 1: Natural Breakpoint
 **User:** "That's working now, what's next?"
 
-**Skill response:**
+**Response:**
 ```markdown
-Great! This seems like a natural breakpoint. You've completed [task summary].
+📦 Great milestone! This session captured:
+- 2 architectural decisions
+- 3 lessons learned
+- 1 efficiency improvement
 
-Would you like to park this session? (`/session/park`)
-
-This will capture:
-- OAuth redirect implementation details
-- Bug fix for state parameter handling
-- Lesson: Always test redirect URIs in both environments
-
-You could then start fresh on the next task.
+Park before moving on? `/session:park`
+Or continue with your next task.
 ```
 
-### Scenario 2: Related Work
+### Scenario 2: Starting Related Work
 **User:** "I need to add another OAuth provider"
 
-**Skill response:**
+**Response:**
 ```markdown
-You implemented Google OAuth recently. Let me find that session:
+🔗 Found related sessions on OAuth:
+- 2025-11-15-oauth-flow: Google OAuth implementation
+- 2025-11-12-jwt-tokens: Token handling patterns
 
-Related: 2025-11-15-oauth-google-flow
-- Implemented redirect handling
-- Fixed state parameter bug
-- Added environment-specific redirect URIs
+Key lesson: "Always verify state param before redirect"
 
-Would you like me to load the full park document for reference?
-Or run `/session/apply` to check for relevant `.claude` improvements?
+Load context? `/session:link oauth`
 ```
 
-### Scenario 3: Knowledge Gap
-**User:** "How do we handle OAuth errors again?"
+### Scenario 3: Long Session Warning
+**Detected:** 50+ messages, 2+ hours elapsed
 
-**Skill response:**
+**Response:**
 ```markdown
-Searching park documents for OAuth error handling...
+📦 Long session detected (55 messages, 2.5 hours)
 
-Found in 2025-11-12-auth-error-handling:
-- Error handling pattern: Catch OAuth exceptions in callback route
-- Log error details but show generic message to user
-- Redirect to login with error param
+Consider parking to:
+- Preserve detailed context before it fades
+- Extract lessons while fresh
+- Free up context window
 
-Would you like the full implementation details from that session?
+Run `/session:park` when ready.
 ```
-
-## File Locations
-
-**Commands (global):**
-- `/home/kodell/.claude/commands/session/park.md`
-- `/home/kodell/.claude/commands/session/apply.md`
-- `/home/kodell/.claude/commands/session/note.md`
-
-**Park documents (per-project):**
-- `.claude-sessions/YYYY-MM-DD-[topic]-compressed.md`
-- `.claude-sessions/current-session-notes.md`
-- `.claude-sessions/archive/` (for old park documents)
-
-**This skill (global):**
-- `/home/kodell/.claude/skills/session-management/SKILL.md`
-
-## Progressive Disclosure
-
-For detailed technical reference on park document format, compression strategies, and application patterns, see:
-- REFERENCE.md (when created)
-- Project `.claude-sessions/README.md` for project-specific guidelines

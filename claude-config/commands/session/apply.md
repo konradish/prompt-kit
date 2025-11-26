@@ -4,6 +4,74 @@ description: Extract and apply .claude improvements from recent park documents
 
 You are about to analyze recent park documents and apply accumulated `.claude` improvement suggestions to skills, commands, and documentation.
 
+## Pre-Flight: Check Overdue Action Items
+
+**CRITICAL: Always check for overdue items FIRST**
+
+1. Read `.claude-sessions/action-items.yaml` if it exists
+2. Find items where `status: pending` and `due < today`
+3. Report overdue items prominently at TOP of output:
+
+```markdown
+## ⚠️ OVERDUE ACTION ITEMS
+
+| ID | Description | Due | Overdue By |
+|----|-------------|-----|------------|
+| ai-2025-11-15-001 | Add OAuth skill | 2025-11-22 | 4 days |
+| ai-2025-11-18-002 | Update CLAUDE.md | 2025-11-25 | 1 day |
+
+**Recommendation:** Address these before creating new items.
+```
+
+## Pre-Flight: Discover Project Structure
+
+**CRITICAL: Understand where things should go BEFORE extracting improvements**
+
+### 1. Check CLAUDE.md Size
+
+```bash
+wc -l CLAUDE.md
+```
+
+| Lines | Status | Action |
+|-------|--------|--------|
+| < 80 | 🟢 OK | Can add one-liner rules if appropriate |
+| 80-100 | 🟡 Warning | Prefer REFERENCE.md for new content |
+| > 100 | 🔴 Overflow | **REFUSE** to add to CLAUDE.md, route all to REFERENCE.md |
+
+**If CLAUDE.md > 100 lines:**
+```markdown
+⚠️ CLAUDE.md OVERFLOW (X lines > 100 limit)
+
+All improvements will be routed to appropriate REFERENCE.md files.
+Consider refactoring CLAUDE.md - move detailed sections to skills/.
+```
+
+### 2. Discover Existing Skills
+
+```bash
+ls -la .claude/skills/
+```
+
+Build a routing table from existing skills:
+
+| Skill | REFERENCE.md Exists | Topics |
+|-------|---------------------|--------|
+| infrastructure | ✓ | tunnels, servers, networking |
+| troubleshooting | ✓ | debugging, logs, errors |
+| database-schema-manager | ✓ | migrations, models |
+| ai-integration | ✓ | prompts, models, APIs |
+
+**Use this table to route improvements to correct REFERENCE.md files.**
+
+### 3. Discover Existing Commands
+
+```bash
+ls -la .claude/commands/*/
+```
+
+Check if suggested command already exists or fits in existing category.
+
 ## Analysis Phase
 
 1. **Read Recent Park Documents**
@@ -16,35 +84,113 @@ You are about to analyze recent park documents and apply accumulated `.claude` i
    - Prioritize high-frequency pain points
    - Note blocking issues vs. nice-to-haves
 
-3. **Assess Impact**
-   - High impact: Prevents repeated mistakes
-   - Medium impact: Improves efficiency
-   - Low impact: Minor convenience
+3. **Assess Impact & Assign Priority**
+   - **P0 (Critical)**: Security issues, data loss, blocking bugs → SLO: 7 days
+   - **P1 (High)**: Repeated 3+ times, significant efficiency gains → SLO: 14 days
+   - **P2 (Medium)**: Nice-to-haves, minor improvements → SLO: 30 days
+
+## Action Item Tracking
+
+### Create/Update action-items.yaml
+
+For each `.claude Improvement` found, create an action item entry:
+
+```yaml
+# .claude-sessions/action-items.yaml
+version: 1
+items:
+  - id: ai-YYYY-MM-DD-NNN        # Format: ai-{date}-{sequence}
+    description: string          # From park doc improvement
+    source: string               # Park doc filename
+    priority: P0|P1|P2           # Based on impact assessment
+    category: skill|command|claude-md|reference-md|other
+    slo_days: 7|14|30            # Based on priority
+    created: YYYY-MM-DD          # Today's date
+    due: YYYY-MM-DD              # created + slo_days
+    status: pending              # Initial status
+```
+
+### Deduplication Rules
+
+Before creating new items:
+1. Check if similar item already exists (fuzzy match on description)
+2. If exists and pending → Increment priority if mentioned again
+3. If exists and completed → Skip (already done)
+4. If exists and deferred → Note in report, don't re-create
+
+### Priority Escalation
+
+If same improvement appears in multiple park docs:
+- 2 mentions → P2 becomes P1
+- 3+ mentions → P1 becomes P0
+- Add note: `Escalated: mentioned in X sessions`
+
+## Routing Decision Tree
+
+**For EACH improvement extracted, follow this decision tree:**
+
+```
+Is it detailed technical reference?
+(configs, IDs, step-by-step debugging, specific values)
+    │
+    ├─ YES → Route to skills/[domain]/REFERENCE.md
+    │        Match domain by keywords:
+    │        - tunnel, cloudflare, server, deploy → infrastructure
+    │        - debug, error, log, trace → troubleshooting
+    │        - database, migration, model, schema → database-schema-manager
+    │        - AI, prompt, gemini, LLM → ai-integration
+    │        - frontend, react, component → frontend (or create)
+    │
+    └─ NO → Is it a repeating workflow (mentioned 3+ times)?
+            │
+            ├─ YES → Create new skill or command
+            │
+            └─ NO → Is it a universal one-liner rule?
+                    │
+                    ├─ YES → Is CLAUDE.md < 80 lines?
+                    │        │
+                    │        ├─ YES → Add to CLAUDE.md
+                    │        └─ NO → Route to REFERENCE.md instead
+                    │
+                    └─ NO → Route to REFERENCE.md
+```
+
+### Routing Examples
+
+| Park Doc Says | Wrong Route | Correct Route |
+|---------------|-------------|---------------|
+| "Add tunnel ID table" | CLAUDE.md | `skills/infrastructure/REFERENCE.md` |
+| "Document auth flow tracing" | CLAUDE.md | `skills/troubleshooting/REFERENCE.md` |
+| "Add DB deprecation pattern" | CLAUDE.md | `skills/database-schema-manager/REFERENCE.md` |
+| "Always run make validate" | REFERENCE.md | CLAUDE.md (one-liner rule) |
+| "Never use docker compose directly" | REFERENCE.md | CLAUDE.md (one-liner rule) |
 
 ## Application Strategy
 
 ### For Skills
 - Create new skill if 3+ sessions needed it
 - Update existing skill if pattern unclear
-- Add to REFERENCE.md if detail missing
-- Location: `~/.claude/skills/[domain]/`
+- **Add detailed content to REFERENCE.md, not SKILL.md**
+- Location: `.claude/skills/[domain]/`
 
 ### For Commands
 - Create new command if workflow repeated 2+ times
 - Update existing command if incomplete
-- Location: `~/.claude/commands/[category]/`
+- Location: `.claude/commands/[category]/`
 
-### For CLAUDE.md
-- Add to Quick Commands if new script/workflow
-- Add to Best Practices if repeated mistake
-- Add to Troubleshooting if common issue
-- Keep under 100 lines (link to docs/ for details)
-
-### For REFERENCE.md
-- Add technical details that were hard to find
-- Clarify ambiguous instructions
-- Add examples for complex patterns
+### For REFERENCE.md (Preferred for Details)
+- **This is where detailed technical info belongs**
+- Specific configs, IDs, values
+- Step-by-step debugging procedures
+- Domain-specific patterns and examples
 - Keep under 600 lines per file
+
+### For CLAUDE.md (One-Liners Only)
+- **ONLY universal one-liner rules**
+- "Always X" or "Never Y" statements
+- Quick command references
+- **NOT detailed procedures or reference tables**
+- Keep under 100 lines - if over, REFUSE to add more
 
 ## Execution Workflow
 
@@ -59,13 +205,43 @@ You are about to analyze recent park documents and apply accumulated `.claude` i
    - Collect all `.claude Improvements` items
    - Categorize by type and impact
 
-3. **Apply Changes**
+3. **Update action-items.yaml**
+   - Create new items for new suggestions
+   - Deduplicate against existing items
+   - Calculate due dates based on priority
+
+4. **Apply Changes**
    - Start with high-impact, high-frequency items
    - Create/update files as needed
    - Test commands/skills if possible
    - Follow progressive disclosure (link vs. duplicate)
 
-## Validate Spec Sync
+5. **Mark Applied Items**
+   - Update status to `completed` in action-items.yaml
+   - Set `completed_date` to today
+   - Increment metrics counters
+
+## Update Metrics
+
+After processing, update `.claude-sessions/metrics.yaml`:
+
+```yaml
+# Increment these counters
+application:
+  action_items_completed: +N     # Items completed this run
+  action_items_overdue: N        # Current overdue count
+  skills_created: +N             # If skills created
+  commands_created: +N           # If commands created
+  claude_md_updates: +N          # If CLAUDE.md updated
+
+# Add history entry
+history:
+  - date: YYYY-MM-DD
+    event: applied
+    details: "Processed N park docs, created M action items, completed K items"
+```
+
+## Validate Spec Sync (If Applicable)
 
 1. **Scan park documents for "Spec Updates" section**
    - Extract boundary additions/modifications
@@ -79,85 +255,127 @@ You are about to analyze recent park documents and apply accumulated `.claude` i
 3. **Validate module spec coverage:**
    ```bash
    python specs/kernel/sync-spec-coverage.py --report
-   # Parse drift-report.txt for discrepancies
    ```
 
 4. **Report spec sync status:**
-   - ✅ All boundaries synced (CSV + module specs aligned)
-   - ⚠️ Drift detected: [list boundaries in CSV but not in specs]
-   - ❌ CSV validation failed: [list errors from validate-boundaries.py]
-   - 💡 Suggested fixes: [commands to run]
-
-5. **Auto-apply fixes (if safe):**
-   - If drift is just missing FR rows → offer to update module spec
-   - If CSV has validation errors → do NOT auto-fix (manual review needed)
+   - ✅ All boundaries synced
+   - ⚠️ Drift detected: [list boundaries]
+   - ❌ Validation failed: [list errors]
 
 ## Report Summary
 
-After completing the above validation:
-   ```markdown
-   ## Session Apply Report - YYYY-MM-DD
+Generate comprehensive report:
 
-   ### Park Documents Analyzed
-   - YYYY-MM-DD-[topic] (X improvements)
-   - YYYY-MM-DD-[topic] (X improvements)
+```markdown
+## Session Apply Report - YYYY-MM-DD
 
-   ### Changes Applied
+### ⚠️ Overdue Action Items (Address First!)
+| ID | Description | Due | Overdue By | Priority |
+|----|-------------|-----|------------|----------|
+| ... | ... | ... | ... | ... |
 
-   #### Skills Created/Updated
-   - [skill-name]: [what changed]
+### Park Documents Analyzed
+- YYYY-MM-DD-[topic] (X improvements extracted)
+- YYYY-MM-DD-[topic] (X improvements extracted)
 
-   #### Commands Created/Updated
-   - [command-name]: [what changed]
+### Action Items Summary
+- **New items created:** N
+- **Items completed:** M
+- **Items pending:** K
+- **Items overdue:** J
 
-   #### CLAUDE.md Updates
-   - [section]: [what added]
+### Priority Breakdown
+| Priority | Pending | Overdue | Completed |
+|----------|---------|---------|-----------|
+| P0 | X | Y | Z |
+| P1 | X | Y | Z |
+| P2 | X | Y | Z |
 
-   #### REFERENCE.md Updates
-   - [file]: [what clarified]
+### Routing Decisions
 
-   ### Spec Sync Status
+#### Items Re-Routed Away from CLAUDE.md
+| Original Target | Re-Routed To | Reason |
+|-----------------|--------------|--------|
+| CLAUDE.md | skills/infrastructure/REFERENCE.md | Detailed config (tunnel IDs) |
+| CLAUDE.md | skills/troubleshooting/REFERENCE.md | CLAUDE.md overflow (234 lines) |
 
-   #### Boundaries Validated
-   - ✅ [boundary-name]: CSV + module spec aligned
-   - ⚠️ [boundary-name]: Drift detected - [description]
-   - ❌ [boundary-name]: CSV validation failed - [error]
+#### Items Applied to Correct Destinations
 
-   #### Module Specs Checked
-   - [module-name]: [X boundaries verified]
+**Skills Created/Updated:**
+- [skill-name]: [what changed]
 
-   #### Recommended Actions
-   - [ ] Run: `python specs/kernel/add-boundary.py --name <name> ...`
-   - [ ] Update module spec FR table for [module]
-   - [ ] Create CONTRACT.md for [boundary]
+**Commands Created/Updated:**
+- [command-name]: [what changed]
 
-   ### Patterns Detected
-   - [Pattern]: Occurred in X sessions → [Action taken]
+**REFERENCE.md Updates (Detailed Info):**
+- `skills/[domain]/REFERENCE.md`: [what added]
 
-   ### Deferred Items
-   - [Item]: [Why deferred]
+**CLAUDE.md Updates (One-Liners Only):**
+- [section]: [one-line rule added] *(only if CLAUDE.md < 80 lines)*
 
-   ### Next Session Focus
-   - [Suggestion for user's next workflow improvement]
+### Patterns Detected
+- [Pattern]: Occurred in X sessions → [Action taken]
+
+### Deferred Items
+- [Item]: [Why deferred] → Added to action-items.yaml as P2
+
+### Recommendations
+1. [Most impactful next action]
+2. [Second priority]
+3. [Third priority]
+
+### ⚠️ CLAUDE.md Health Check
+*(Include if CLAUDE.md > 80 lines)*
+
+**Current size:** X lines (limit: 100)
+**Status:** 🔴 OVERFLOW / 🟡 WARNING / 🟢 OK
+
+**If overflow, recommend:**
+1. Move tunnel/infrastructure details → `skills/infrastructure/REFERENCE.md`
+2. Move debugging patterns → `skills/troubleshooting/REFERENCE.md`
+3. Move database patterns → `skills/database-schema-manager/REFERENCE.md`
+4. Keep only universal one-liner rules in CLAUDE.md
+
+### Metrics Update
+- Sessions analyzed: N
+- Completion rate: X% (completed / total)
+- Overdue rate: Y% (overdue / pending)
+```
+
+## Clean Up
+
+1. **Archive old park documents**
+   ```bash
+   # Move park docs > 30 days to archive
+   find .claude-sessions/ -name "*-compressed.md" -mtime +30 -exec mv {} .claude-sessions/archive/ \;
    ```
 
-5. **Clean Up**
-   - Mark applied suggestions as complete in park documents
-   - Archive park documents > 30 days to `.claude-sessions/archive/`
+2. **Ensure archive directory exists**
+   ```bash
+   mkdir -p .claude-sessions/archive/
+   ```
 
 ## Success Criteria
 
-- High-impact improvements applied immediately
-- Patterns detected and addressed
-- No duplicate content across files
-- Progressive disclosure maintained
-- File size limits respected
-- Changes tested where possible
+- [ ] Overdue items reported prominently
+- [ ] CLAUDE.md size checked BEFORE applying anything
+- [ ] Existing skills discovered and used for routing
+- [ ] Routing decision tree followed for each improvement
+- [ ] Detailed content routed to REFERENCE.md, not CLAUDE.md
+- [ ] All improvements tracked in action-items.yaml
+- [ ] Priorities assigned correctly
+- [ ] Due dates calculated based on SLOs
+- [ ] Metrics updated accurately
+- [ ] Re-routing decisions documented in report
 
 ## Important Notes
 
+- **Check CLAUDE.md size FIRST** - If > 100 lines, route everything to REFERENCE.md
+- **Discover existing skills FIRST** - Don't create new when existing skill covers the domain
+- **CLAUDE.md is for one-liners only** - "Always X", "Never Y", not detailed reference
+- **REFERENCE.md is for details** - Configs, IDs, procedures, examples
+- **Check overdue items FIRST** - Don't create new work while old work languishes
 - **Don't apply everything blindly** - Use judgment on value
-- **Prefer links over duplication** - Keep files focused
+- **Prefer REFERENCE.md over CLAUDE.md** - When in doubt, route to skill's REFERENCE.md
 - **Test before committing** - Verify commands/skills work
-- **Respect file size limits** - CLAUDE.md < 100 lines, SKILL.md < 500 lines
-- **Document rationale** - Explain why suggestion applied or deferred
+- **Document re-routing decisions** - Explain why item was routed away from original target
