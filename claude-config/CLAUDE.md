@@ -8,6 +8,7 @@ This file contains global instructions that Claude Code will follow across all p
 - Don't work around failures by using placeholders, ask the user first
 - **Subshell PATH Issues**: When using commands that execute strings in a subshell (e.g., `bash -c "..."`, `asciinema rec -c "..."`), aliases from `.zshrc` or `.bashrc` will not be available. Always use the absolute path to executables inside these commands. Use `which <command>` to find the path before constructing the subshell command.
 - **Park and Commit**: When user says "park and commit", always include the park document (`.claude-sessions/*.md`) in the commit along with code changes
+- **Docker Compose**: File is named `compose.yaml` (not `docker-compose.yml`). Located in `infra/` directory.
 
 ## Development Philosophy
 
