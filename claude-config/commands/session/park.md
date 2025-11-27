@@ -28,6 +28,16 @@ Review the conversation history and identify:
 
 4. **Mistakes & Inefficiencies** (CRITICAL - Document These First)
 
+   **Tool Call Failures & Inefficiencies:** ⚠️ REVIEW EVERY TOOL CALL
+   - Invalid file paths (Read/Edit on non-existent files)
+   - Failed searches (Grep/Glob that returned nothing useful)
+   - Wrong parameters (incorrect regex, wrong directory)
+   - Sequential calls that could have been parallel
+   - Wrong tool selection (e.g., Bash cat instead of Read)
+   - Repeated/redundant searches for same information
+   - Overly broad searches that returned too much noise
+   - Missing context that required follow-up calls
+
    **AI Agent Mistakes:**
    - Wrong assumptions, missing knowledge, incorrect approaches YOU took
    - Commands/approaches YOU tried that failed or had to be abandoned
@@ -105,6 +115,20 @@ Use this AI-optimized format:
 - 💡 [Key insight for future]
 
 ## Mistakes & Efficiency Improvements
+
+### Tool Call Failures & Inefficiencies
+*(Review conversation for ALL failed/suboptimal tool calls)*
+
+| Tool | Issue | Better Approach |
+|------|-------|-----------------|
+| Read | File not found: `/wrong/path.md` | Should have used Glob first to find file |
+| Grep | No results for `pattern` | Pattern too specific, try broader search |
+| Bash | Sequential `git status` then `git diff` | Parallel: both in single message |
+| Edit | Failed - old_string not found | Read file first to get exact content |
+
+**Wasted tool calls:** N calls that returned errors or empty results
+**Sequential→Parallel opportunities:** N instances where parallel calls would be faster
+**Wrong tool selections:** [List any Bash cat/grep instead of Read/Grep]
 
 ### AI Agent Mistakes
 1. **[Wrong approach]**: [Why seemed right, why failed, correct approach]
