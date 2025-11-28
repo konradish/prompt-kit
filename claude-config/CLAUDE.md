@@ -17,6 +17,22 @@ This file contains global instructions that Claude Code will follow across all p
 - Progressive disclosure in documentation
 - Security-first approach (tenant isolation, auth)
 
+## Plan Grounding Requirements
+
+**Before creating implementation plans, verify environmental grounding:**
+
+1. **Runtime Context**: Where does this code actually run? (Browser, Node.js, Edge Runtime, Cloudflare Workers, Docker container)
+2. **Network Constraints**: What URLs/DNS are available? (Internal Docker DNS vs external, relative vs absolute paths)
+3. **Failure Behavior**: What happens when things fail? (Graceful degradation vs fail-fast, user experience impact)
+4. **Problem Validation**: Is there an actual problem to solve? (Don't optimize what isn't broken)
+5. **Environment Parity**: Does the plan work in ALL deployment environments? (Local dev, staging, production)
+
+**Red Flags** - Stop and reconsider if:
+- Plan assumes uniform runtime across environments
+- No consideration of how code behaves on failure
+- Solving a theoretical problem without evidence it's real
+- Major refactor without testing in production-like environment first
+
 ## Quality Standards
 
 - CLAUDE.md files: < 100 lines
