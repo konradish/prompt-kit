@@ -1,44 +1,46 @@
 # Prompt Kit Library
 
-This folder collects ready-to-use LLM documents. Copy the template you need, fill in the blanks, and paste it into your preferred chat interface.
+Ready-to-use LLM documents and Claude Code configuration patterns.
 
-## Available Documents
+## Quick Start Templates
+
+### Starter Templates
+- **[templates/fullstack-starter/](../templates/fullstack-starter/)** – **NEW**: Minimal Claude Code config for fullstack projects with Day-0 pre-flight checklist. Prevents common rework patterns.
 
 ### Workflows & Planning
-- **focus-htk.md** – Extract the best next action from broad inputs using FOCUS + Hypothesis→Test Kernel. Works across software, troubleshooting, and life logistics. **Updated 2025-11-16**: Now includes documentation sync obligations.
-- **project-kickoff.md** – Frame new tasks with goals, constraints, and communication plans.
-- **solution-outline.md** – Summarize how to approach a known problem before writing detailed output.
-- **debugging-playbook.md** – Walk through reproducing, isolating, and fixing issues methodically.
+- **[focus-htk.md](./focus-htk.md)** – FOCUS + Hypothesis→Test Kernel methodology. Works across software, troubleshooting, and life logistics.
+- **[project-kickoff.md](./project-kickoff.md)** – Frame new tasks with goals, constraints, and Day-0 pre-flight checklist. **Updated**: Now includes fullstack pre-flight checklist.
+- **[solution-outline.md](./solution-outline.md)** – Summarize approach to a known problem before writing detailed output.
+- **[debugging-playbook.md](./debugging-playbook.md)** – Walk through reproducing, isolating, and fixing issues. **Updated**: Now includes defensive coding patterns and infrastructure verification commands.
 
-### Claude Code Architecture
-- **claude-code-best-practices.md** – **NEW 2025-11-16**: Comprehensive guide to skills vs agents, global vs project configuration, progressive disclosure, file size standards, and coordination patterns. The authoritative reference for Claude Code organization.
-- **claude-code-features.md** – Choose between slash commands, skills, subagents, MCP servers, and hooks using a compositional playbook.
-- **claude-code-docs-pattern.md** – **NEW 2025-11-16**: Reusable template for organizing `.claude/` directory structure with skills, commands, and agents. Includes progressive disclosure, file size constraints, and lock-in mitigation strategies.
-- **claude-knowledge-architecture.md** – Structure modular .claude/ knowledge systems for token efficiency.
-- **focus-htk.md** – FOCUS + HTK protocol for hypothesis-driven development. Implemented as global skill in `~/.claude/skills/htk-workflow/`.
-- **smart-claude-context-template.md** – Build CLAUDE.md with selective context loading.
-- **knowledge-module-template.md** – Template for individual knowledge modules in .claude/.
-- **agent-delegation-pattern.md** – Multi-agent workflows for specialized, token-efficient execution.
+## Claude Code Architecture
 
-### Documentation & Governance
-- **documentation-governance.md** – **NEW 2025-11-16**: Project-agnostic documentation standards, sync obligations, and quality gates. Ensures documentation stays current with code, specs, and automation. Includes sync obligation matrix, validation gates, and progressive disclosure strategy.
+- **[claude-code-best-practices.md](./claude-code-best-practices.md)** – Skills vs agents, global vs project config, progressive disclosure, file size standards. **Trimmed to ~280 lines**.
+- **[claude-code-features.md](./claude-code-features.md)** – Choose between slash commands, skills, subagents, MCP servers, and hooks.
+- **[agent-delegation-pattern.md](./agent-delegation-pattern.md)** – Multi-agent workflows for specialized, token-efficient execution.
 
-### Documentation & Diagramming
-- **mermaid-diagram-guide.md** – Generate complex Mermaid visuals with working samples and syntax guardrails.
-- **writing-style-guide.md** – Keep prose consistent and user-friendly across deliverables.
-- **boundary-decomposition-guide.md** – Universal boundary decomposition for any project type.
+## Documentation & Diagramming
 
-## Architecture References
+- **[mermaid-diagram-guide.md](./mermaid-diagram-guide.md)** – Generate complex Mermaid visuals with working samples.
+- **[writing-style-guide.md](./writing-style-guide.md)** – Keep prose consistent and user-friendly.
+- **[boundary-decomposition-guide.md](./boundary-decomposition-guide.md)** – Universal boundary decomposition for any project type.
 
-Longer guides for complex patterns and system design:
-- **../architectures/claude-intelligence-system.md** – Complete system for scalable Claude Code knowledge management (includes project plan, both modular and intelligent context selection approaches, implementation phases, and success metrics).
+---
+
+## File Size Standards
+
+| File Type | Max Lines | Purpose |
+|-----------|-----------|---------|
+| CLAUDE.md | 200 | Quick reference, always loaded |
+| SKILL.md | 500 | Core workflow, triggered on keywords |
+| REFERENCE.md | 600 | Detailed specs, loaded on-demand |
 
 ---
 
 ## Usage Notes
 
-- **Quick Templates (~400 words)**: Most documents are concise for easy reuse
-- **Reference Templates (~2000+ words)**: documentation-governance.md and claude-code-docs-pattern.md are comprehensive reference templates for project setup
-- **Cross-Project Compatible**: All templates are project-agnostic and can be adapted to any codebase
+- **Quick Templates** (~100-300 lines): Most workflow docs are concise for easy reuse
+- **Reference Docs** (~300-600 lines): Architecture guides provide more detail
+- **Starter Templates**: Copy to your project and customize
 
-Add new documents as standalone Markdown files. Keep workflow templates under ~400 words for quick reuse. Reference templates can be longer when comprehensive coverage is needed.
+Add new documents as standalone Markdown files. Keep workflow templates concise. Use progressive disclosure for detailed content.

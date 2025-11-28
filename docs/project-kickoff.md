@@ -36,4 +36,61 @@ Use this template when scoping a new request for an LLM so you capture constrain
 - Stakeholders who must be looped in.
 - Handoff notes or follow-up tasks after completion.
 
-Fill this out quickly (2-3 minutes) before diving deeper. It keeps downstream prompts focused and repeatable.
+---
+
+## Day-0 Pre-Flight Checklist
+
+**Complete these items before writing code to prevent common rework patterns.**
+
+### Auth Decision Tree
+- [ ] Auth method chosen: OAuth / JWT / Magic Link / Session
+- [ ] Token storage decided: httpOnly cookies / localStorage
+- [ ] Mock mode required? If yes, define skip points
+- [ ] Full auth path documented (Browser → Proxy → App → Backend → OAuth Provider)
+
+### API Contract
+- [ ] Response envelope defined: `{ success: boolean, message: string, data: T }`
+- [ ] Error format standardized: `{ success: false, message: string, error_code: string }`
+- [ ] Type generation configured: OpenAPI → TypeScript pipeline
+- [ ] Defensive defaults: All arrays default to `[]`, all objects default to `{}`
+
+### Frontend Patterns
+- [ ] Data fetching approach: React Query / SWR / custom hooks
+- [ ] UI state management: Zustand / Context / Redux
+- [ ] Form handling: React Hook Form + Zod / Formik
+- [ ] Styling approach: Tailwind / CSS Modules / Styled Components
+- [ ] Dark mode: supported from day 1? If yes, configure theme system
+
+### Infrastructure Locks
+- [ ] Database version recorded (do NOT change without migration plan)
+- [ ] Reverse proxy configured: Traefik / Nginx / Cloudflare
+- [ ] All `NEXT_PUBLIC_*` vars in compose.yaml (baked at build time)
+- [ ] Tunnel/domain configuration documented
+
+### Environment Parity
+- [ ] Local dev environment matches production structure
+- [ ] All environment variables documented in `.env.template`
+- [ ] Docker compose tested with fresh clone
+
+---
+
+## Common Rework Triggers (Watch For These)
+
+**Auth Issues:**
+- Infinite redirect loops → Check for redirect logic in multiple locations
+- 401 errors → Verify token propagation through all layers
+- Mock mode bugs → Ensure mock checks at EVERY layer (API client, stores, routes)
+
+**API Contract Issues:**
+- `undefined` errors → Response data not unwrapped properly
+- "Cannot read property of undefined" → Missing defensive defaults
+- Type mismatches → Hand-written interfaces drifting from backend
+
+**Infrastructure Issues:**
+- Env var changes not taking effect → Docker needs rebuild (`--force-recreate --build`)
+- Database version mismatch → Check container version vs compose.yaml
+- 502/503 errors → Check proxy routing and container health
+
+---
+
+Fill this out quickly (5-10 minutes) before diving deeper. The pre-flight checklist prevents the most common sources of rework in fullstack projects.
