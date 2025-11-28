@@ -1,0 +1,46 @@
+version: 1
+entities:
+  - name: claude-md-standards
+    type: pattern
+    sessions:
+      - 2025-11-28-claude-md-line-limit-update-compressed.md
+    keywords: [claude.md, line-limit, quality-standards, progressive-disclosure]
+    first_seen: 2025-11-28
+    last_updated: 2025-11-28
+
+  - name: plan-grounding-requirements
+    type: feature
+    sessions:
+      - 2025-11-28-claude-md-line-limit-update-compressed.md
+    keywords: [planning, grounding, runtime-context, environment]
+    first_seen: 2025-11-28
+    last_updated: 2025-11-28
+
+  - name: docs-curator-skill
+    type: component
+    sessions:
+      - 2025-11-28-claude-md-line-limit-update-compressed.md
+    keywords: [skill, documentation, validation, curator]
+    first_seen: 2025-11-28
+    last_updated: 2025-11-28
+
+  - name: session-commands
+    type: component
+    sessions:
+      - 2025-11-28-claude-md-line-limit-update-compressed.md
+    keywords: [park, apply, session, commands]
+    first_seen: 2025-11-28
+    last_updated: 2025-11-28
+
+relationships:
+  - from: 2025-11-28-claude-md-line-limit-update-compressed.md
+    to: claude-md-standards
+    type: implements
+    strength: high
+    context: "Updated line limit standard from 100 to 200"
+
+  - from: 2025-11-28-claude-md-line-limit-update-compressed.md
+    to: 2025-11-26-park-flywheel-v2-implementation-compressed.md
+    type: builds_on
+    strength: medium
+    context: "Uses park workflow established in earlier session"

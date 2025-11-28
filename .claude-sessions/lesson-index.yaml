@@ -1,0 +1,25 @@
+version: 1
+lessons:
+  - id: lesson-2025-11-28-001
+    source: 2025-11-28-claude-md-line-limit-update-compressed.md
+    lesson: "When changing a standard/limit value, search comprehensively - it's often referenced in many places across docs, commands, and skills."
+    category: workflow
+    impact: medium
+    keywords: [standards, documentation, grep, search, consistency]
+    last_surfaced: null
+    surface_after: 2025-12-05
+    interval_days: 7
+    times_surfaced: 0
+    times_applied: 0
+
+  - id: lesson-2025-11-28-002
+    source: 2025-11-28-claude-md-line-limit-update-compressed.md
+    lesson: "Read all target files before attempting batch edits - the Edit tool requires files to be read first."
+    category: efficiency
+    impact: low
+    keywords: [edit, read, tool, parallel, batch]
+    last_surfaced: null
+    surface_after: 2025-12-05
+    interval_days: 7
+    times_surfaced: 0
+    times_applied: 0
