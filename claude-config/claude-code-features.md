@@ -177,7 +177,7 @@ description: Use this skill when making database schema changes...
 |-----------|-----------|-----------|
 | **SKILL.md** | 500 | Core workflow only; link to REFERENCE.md for details |
 | **REFERENCE.md** | 600 | Detailed specs; loaded on-demand via progressive disclosure |
-| **CLAUDE.md** | 100 | Quick reference only; link to docs/ for details |
+| **CLAUDE.md** | 200 | Quick reference only; link to docs/ for details |
 | **Commands (/.claude/commands/)** | 300 | Single responsibility per command |
 
 **Progressive Disclosure Pattern:**

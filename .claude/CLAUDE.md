@@ -64,7 +64,7 @@ experiments/
 ### Documentation Standards
 
 1. **Progressive Disclosure** (from best practices guide)
-   - CLAUDE.md: < 100 lines
+   - CLAUDE.md: < 200 lines
    - SKILL.md: < 500 lines
    - REFERENCE.md: < 600 lines
 

@@ -38,7 +38,7 @@ Claude Code uses a hierarchical settings system where configurations cascade fro
 
 ```
 ~/.claude/                          # Global configuration
-├── CLAUDE.md                       # Global instructions (< 100 lines)
+├── CLAUDE.md                       # Global instructions (< 200 lines)
 ├── settings.json                   # User settings
 ├── commands/                       # Global slash commands
 │   ├── analysis/
@@ -49,7 +49,7 @@ Claude Code uses a hierarchical settings system where configurations cascade fro
         └── SKILL.md
 
 <project>/.claude/                  # Project configuration
-├── CLAUDE.md                       # Project instructions (< 100 lines)
+├── CLAUDE.md                       # Project instructions (< 200 lines)
 ├── settings.json                   # Team settings (version controlled)
 ├── settings.local.json             # Personal overrides (gitignored)
 ├── commands/                       # Project slash commands
@@ -109,7 +109,7 @@ Claude Code uses a hierarchical settings system where configurations cascade fro
 - Security-first approach (tenant isolation, auth)
 
 ## Quality Standards
-- CLAUDE.md files: < 100 lines
+- CLAUDE.md files: < 200 lines
 - SKILL.md files: < 500 lines
 - REFERENCE.md files: < 600 lines
 - Use progressive disclosure pattern
@@ -258,7 +258,7 @@ Claude Code uses a hierarchical settings system where configurations cascade fro
 
 | File Type | Max Lines | Purpose | Loading Strategy |
 |-----------|-----------|---------|------------------|
-| **CLAUDE.md** | 100 | Quick reference, links to docs | Always loaded |
+| **CLAUDE.md** | 200 | Quick reference, links to docs | Always loaded |
 | **SKILL.md** | 500 | Core workflow, procedures | Loaded when triggered |
 | **REFERENCE.md** | 600 | Detailed specs, examples | Loaded on-demand |
 | **Agent.md** | Varies | Comprehensive domain guidance | Loaded when invoked |
@@ -832,7 +832,7 @@ Claude delegates to qa-and-test-engineer for tests
 - ✅ Long-running, stateful tasks
 
 ### File Size Targets:
-- CLAUDE.md: < 100 lines
+- CLAUDE.md: < 200 lines
 - SKILL.md: < 500 lines
 - REFERENCE.md: < 600 lines
 - Commands: < 300 lines

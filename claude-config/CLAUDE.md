@@ -35,7 +35,7 @@ This file contains global instructions that Claude Code will follow across all p
 
 ## Quality Standards
 
-- CLAUDE.md files: < 100 lines
+- CLAUDE.md files: < 200 lines
 - SKILL.md files: < 500 lines
 - REFERENCE.md files: < 600 lines
 - Use progressive disclosure pattern

@@ -54,7 +54,7 @@
 
 | File Type | Target Size | Maximum Size | Action if Exceeded |
 |-----------|------------|--------------|-------------------|
-| CLAUDE.md | 50-100 lines | 150 lines | Split into progressive layers |
+| CLAUDE.md | 100-150 lines | 200 lines | Split into progressive layers |
 | README.md | 100-200 lines | 300 lines | Move details to docs/ |
 | SKILL.md | 200-300 lines | 500 lines (hard limit) | Split into REFERENCE.md + guides |
 | REFERENCE.md | 300-500 lines | 600 lines | Split into focused sub-files |

@@ -25,7 +25,7 @@ For general documentation workflows across projects, use the global `/doc-workfl
 ### 1. Documentation Validation
 
 Check that docs meet standards:
-- File size limits (< 100/500/600 lines based on type)
+- File size limits (< 200/500/600 lines based on type)
 - Gerund naming convention
 - Required sections present
 - Examples included where appropriate
@@ -155,7 +155,7 @@ Enforces limits from `docs/claude-code-best-practices.md`:
 
 | File Type | Line Limit | Purpose |
 |-----------|-----------|----------|
-| CLAUDE.md | < 100 | Core project context |
+| CLAUDE.md | < 200 | Core project context |
 | SKILL.md | < 500 | Skill workflow |
 | REFERENCE.md | < 600 | Detailed reference |
 | Templates | Variable | Based on type |

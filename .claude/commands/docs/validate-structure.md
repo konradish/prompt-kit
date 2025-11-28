@@ -19,7 +19,7 @@ For each document, check against progressive disclosure standards:
 
 | Pattern | Limit | Files Matching |
 |---------|-------|----------------|
-| CLAUDE.md | 100 lines | */CLAUDE.md |
+| CLAUDE.md | 200 lines | */CLAUDE.md |
 | SKILL.md | 500 lines | */SKILL.md |
 | REFERENCE.md | 600 lines | */REFERENCE.md |
 | Other templates | Reasonable (< 800) | *.md |

@@ -152,7 +152,7 @@ Before listing improvements, determine the correct destination:
 |------------|-------------|-----------|
 | Detailed technical reference (configs, IDs, patterns) | `skills/[domain]/REFERENCE.md` | CLAUDE.md |
 | A repeating workflow (3+ occurrences) | New skill or command | CLAUDE.md |
-| Project-wide one-liner rule | CLAUDE.md (if <100 lines) | Detailed prose |
+| Project-wide one-liner rule | CLAUDE.md (if <200 lines) | Detailed prose |
 | Domain-specific debugging steps | `skills/troubleshooting/REFERENCE.md` | CLAUDE.md |
 
 ### Skills (patterns that repeat 3+ times)

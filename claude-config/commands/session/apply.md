@@ -35,13 +35,13 @@ wc -l CLAUDE.md
 
 | Lines | Status | Action |
 |-------|--------|--------|
-| < 80 | 🟢 OK | Can add one-liner rules if appropriate |
-| 80-100 | 🟡 Warning | Prefer REFERENCE.md for new content |
-| > 100 | 🔴 Overflow | **REFUSE** to add to CLAUDE.md, route all to REFERENCE.md |
+| < 150 | 🟢 OK | Can add one-liner rules if appropriate |
+| 150-200 | 🟡 Warning | Prefer REFERENCE.md for new content |
+| > 200 | 🔴 Overflow | **REFUSE** to add to CLAUDE.md, route all to REFERENCE.md |
 
-**If CLAUDE.md > 100 lines:**
+**If CLAUDE.md > 200 lines:**
 ```markdown
-⚠️ CLAUDE.md OVERFLOW (X lines > 100 limit)
+⚠️ CLAUDE.md OVERFLOW (X lines > 200 limit)
 
 All improvements will be routed to appropriate REFERENCE.md files.
 Consider refactoring CLAUDE.md - move detailed sections to skills/.
@@ -370,7 +370,7 @@ Generate comprehensive report:
 
 ## Important Notes
 
-- **Check CLAUDE.md size FIRST** - If > 100 lines, route everything to REFERENCE.md
+- **Check CLAUDE.md size FIRST** - If > 200 lines, route everything to REFERENCE.md
 - **Discover existing skills FIRST** - Don't create new when existing skill covers the domain
 - **CLAUDE.md is for one-liners only** - "Always X", "Never Y", not detailed reference
 - **REFERENCE.md is for details** - Configs, IDs, procedures, examples

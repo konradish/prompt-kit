@@ -56,7 +56,7 @@ project-root/
 | **SKILL.md** | 200-300 | **500 (HARD LIMIT)** | Performance degradation beyond 500 |
 | **REFERENCE.md** | 300-500 | **600** | Split into focused guides if exceeded |
 | **Command** | 100-200 | **300** | Keep atomic and single-purpose |
-| **CLAUDE.md** | 50-100 | **150** | Absolute minimum context only |
+| **CLAUDE.md** | 100-150 | **200** | Absolute minimum context only |
 | **Guide docs** | 500-800 | **1000** | Split into directory structure |
 
 **Why these limits?**
