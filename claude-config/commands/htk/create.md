@@ -6,6 +6,22 @@ Generate a complete HTK (Hypothesis → Test Kernel) structure: **$ARGUMENTS**
 
 Create a well-formed HTK with clear hypothesis, single change, measurable outcome, and decision tree.
 
+## HTK Types
+
+### Standard HTK
+Test a specific hypothesis about implementation, performance, or behavior.
+
+### Tracer Bullet HTK
+**When**: Architecture is unproven, building something new, or integration path is uncertain.
+
+A tracer bullet HTK validates that the end-to-end path exists before optimizing any piece. It's a thin slice through ALL layers—just enough to prove data can flow from start to finish.
+
+**Tracer Bullet Characteristics**:
+- Change touches multiple layers (but minimally)
+- Metric is "path works" not "path is optimal"
+- Pass enables detailed HTKs on individual components
+- Fail reveals hard blockers early (before wasted effort)
+
 ## Execution
 
 ### 1. Parse Input
@@ -183,6 +199,41 @@ Decision:
 Why first: Auth bugs in production last month; current middleware has 45% coverage and is hard to test due to tight coupling.
 ```
 
+### Example 4: Tracer Bullet HTK
+
+**Input:** `$ARGUMENTS: "Prove we can build a data pipeline from Kafka to dashboard"`
+
+**Output:**
+```
+# HTK: tracer-kafka-dashboard
+
+Goal: Prove data can flow from Kafka event → processing → storage → API → dashboard
+
+Hypothesis: If we build minimal e2e path, a test event appears on dashboard within 5 seconds
+
+Test:
+* Change: Create thin path: Kafka consumer → write to DB → API endpoint → React component
+* Method:
+  - Kafka consumer: read from test topic, write raw JSON to Postgres
+  - API: single GET endpoint returning latest 10 events
+  - Dashboard: simple list component showing events
+  - Send 10 test events, verify all appear
+* Rollback: git revert <commit> (all in one branch)
+
+Verify:
+* Metric: 10/10 events visible on dashboard within 5s of send
+* Evidence: experiments/tracer-kafka-dashboard/screenshot.png + timing-log.json
+
+Decision:
+* Pass → HTK on each layer: Kafka throughput, DB schema, API performance, dashboard UX
+* Fail → Identify which layer blocked (Kafka auth? DB connection? API routing? CORS?)
+  → Fix blocker → Rerun tracer before detailed work
+
+Why first: Three teams will build pieces of this pipeline; tracer proves integration works before parallel development begins.
+```
+
+**Note**: This tracer bullet deliberately does NOT optimize any layer. It's a thin slice proving the path exists. Once PASS, each team can HTK their layer knowing the integration works.
+
 ## Validation Rules
 
 Before outputting HTK, verify:
@@ -202,5 +253,12 @@ Called by `htk-workflow` skill when:
 - User has clear hypothesis to test
 - FOCUS has been chosen
 - Ready to execute experiment
+- Architectural certainty is LOW (create tracer bullet HTK)
 
-Often followed by `/htk-version` for git hygiene setup.
+**Decision flow**:
+1. Assess architectural certainty
+2. If LOW → Create tracer bullet HTK first
+3. If HIGH → Create standard HTK targeting specific hypothesis
+4. After HTK completes → Decide next HTK based on learnings (never pre-plan)
+
+Often followed by `/htk-run-next` for execution with git hygiene.

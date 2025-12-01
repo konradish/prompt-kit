@@ -2,7 +2,7 @@
 
 ---
 name: htk-workflow
-description: Activates on "hypothesis", "HTK", "test kernel", "experiment", "focus", "test if", "prove that" keywords. Guides systematic hypothesis-driven development with minimal changes, clear pass/fail criteria, and git version hygiene.
+description: Activates on "hypothesis", "HTK", "test kernel", "experiment", "focus", "test if", "prove that", "tracer bullet" keywords. Guides systematic hypothesis-driven development with minimal changes, clear pass/fail criteria, and git version hygiene.
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
@@ -11,6 +11,7 @@ allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 Guide developers through hypothesis-driven development using the FOCUS + HTK methodology:
 - **FOCUS**: Find the best next move when input is broad
 - **HTK**: Emit smallest testable change with clear pass/fail criteria
+- **Tracer Bullet**: Thin end-to-end skeleton when architecture is unproven
 - **Version Hygiene**: Keep main branch green, commit artifacts even on failure
 
 ## Core Principles
@@ -18,8 +19,20 @@ Guide developers through hypothesis-driven development using the FOCUS + HTK met
 1. **Change one thing** - Single variable per test
 2. **Define pass/fail** - Concrete metrics, no ambiguity
 3. **Why-first** - ≤2 sentences explaining reasoning
-4. **No unverified foundations** - Build only on proven ground
+4. **No unverified foundations** - Build only on proven ground (tracer bullets first)
 5. **Keep main green** - Failed code reverts, artifacts commit
+6. **No pipelines** - Next HTK decided AFTER current one completes
+
+## Philosophy: No Pipelines
+
+**A "plan" of hypotheses assumes you know what you'll test before you've learned from the first test.** This violates the spirit of hypothesis-driven development.
+
+Instead:
+- Set destination (north star) and exit criteria (stop rules)
+- Run ONE HTK
+- Learn from it
+- Decide next HTK based on learnings
+- Repeat until stop rules met
 
 ## Workflow Modes
 
@@ -28,15 +41,16 @@ Detect mode from user request or ask:
 ### Mode: `auto` (Default)
 - **Broad input** → Run FOCUS then HTK
 - **Narrow input** → HTK only
+- **Architectural uncertainty** → Tracer Bullet HTK first
 
-### Mode: `plan`
-Build HTK pipeline (3-7 HTKs) toward north star with WIP=1
+### Mode: `scope`
+Set north star + stop rules + assess architectural certainty + define FIRST HTK only
 
 ### Mode: `run-next`
-Execute next HTK from pipeline with version steps
+Execute current HTK with version steps, then decide next based on learnings
 
 ### Mode: `summarize`
-Roll up recent HTKs, learnings, propose next HTK
+Roll up recent HTKs, learnings, propose next single HTK
 
 ## Execution Flow
 
@@ -59,7 +73,17 @@ Create minimal seed (only if critical):
 
 State up to 3 frozen assumptions and proceed.
 
-### Step 2: Execute Mode
+### Step 2: Assess Architectural Certainty
+
+Before any HTK, ask: **"Do we know the path exists?"**
+
+**Low certainty** (new system, unproven integration):
+→ First HTK = Tracer Bullet (thin e2e skeleton)
+
+**High certainty** (known architecture, optimizing):
+→ First HTK targets highest-impact hypothesis
+
+### Step 3: Execute Mode
 
 #### For `auto` or FOCUS:
 Call `/htk-focus` to generate FOCUS options (≤3):
@@ -89,22 +113,30 @@ Verify:
 * Evidence: <where it will live>
 
 Decision:
-* Pass → <next smallest module/test>
-* Fail → <most likely cause> → <adjustment> → <rerun>
+* Pass → <what we learned; likely next direction>
+* Fail → <diagnostic step> → <alternative> → <rerun>
 
 Why first: <≤2 sentences>
 ```
 
-#### For pipeline:
-Call `/htk-plan` to build ranked HTK pipeline
+#### For Tracer Bullet HTK:
+Same structure, but:
+- **Hypothesis**: "If we build thin e2e skeleton, we prove the path is viable"
+- **Change**: Minimal implementation touching ALL layers
+- **Metric**: Request completes through full stack
+- **Pass**: Architecture validated → proceed to optimization
+- **Fail**: Hard blocker discovered early → pivot or stop
+
+#### For scope:
+Call `/htk-plan` (now `/htk-scope`) to set north star + stop rules + first HTK
 
 #### For execution:
 Call `/htk-run-next` with version hygiene steps
 
 #### For rollup:
-Call `/htk-summarize` to aggregate learnings
+Call `/htk-summarize` to aggregate learnings and propose next single HTK
 
-### Step 3: Version Hygiene
+### Step 4: Version Hygiene
 
 **Pre-check**: Ensure working tree is clean
 
@@ -129,33 +161,26 @@ git reset --hard HEAD
 
 **Format**: `HTK:<short-label> — <PASS/FAIL> — <metric summary>`
 
-### Step 4: Documentation Sync
+### Step 5: Decide Next HTK
 
-Before marking HTK as PASS, verify:
-- [ ] specs/ updated if architecture changed
-- [ ] docs/ updated if user-facing behavior changed
-- [ ] .claude/skills/ updated if workflows changed
-- [ ] Cross-references validated (no broken links)
+After each HTK completes:
+1. Review what we learned (pass or fail)
+2. Consider what the metrics revealed
+3. Identify new questions that emerged
+4. Propose NEXT single HTK based on learnings
+5. Repeat until stop rules met
 
-Add to commit message:
-```
-Updated:
-- specs/modules/[module].md (new boundary)
-- docs/[doc].md (new content)
-- .claude/skills/[skill]/REFERENCE.md (pattern update)
-```
+**Never pre-plan sequences.** Each HTK informs the next.
 
 ## Integration with Commands
-
-This skill coordinates specialized commands:
 
 | Command | Purpose | When |
 |---------|---------|------|
 | `/htk-focus` | Generate FOCUS options | Broad/unclear input |
 | `/htk-create` | Create single HTK | Clear hypothesis |
-| `/htk-plan` | Build HTK pipeline | Multi-step initiative |
-| `/htk-run-next` | Execute next from plan | Active pipeline |
-| `/htk-summarize` | Rollup and replan | After HTK runs |
+| `/htk-plan` | Set scope (north star + stop rules + first HTK) | Starting new initiative |
+| `/htk-run-next` | Execute current HTK | Ready to test |
+| `/htk-summarize` | Rollup learnings, propose next HTK | After HTK completes |
 
 ## Behavior Rules
 
@@ -165,6 +190,8 @@ This skill coordinates specialized commands:
 4. **Commit failed artifacts** - Never lose learnings
 5. **WIP=1** - One active HTK at a time
 6. **Why-first** - Explain reasoning before action
+7. **Tracer first** - When architecture unproven, validate path before details
+8. **No sequences** - Never output "then do X, then Y, then Z"
 
 ## Auto-Activation Triggers
 
@@ -172,48 +199,74 @@ This skill auto-activates when user request contains:
 - "hypothesis" or "test if"
 - "HTK" or "test kernel"
 - "experiment" or "prove that"
+- "tracer bullet" or "prove the path"
 - "focus" with development context
 - "what should we test" or "what's next"
 
-## Progressive Disclosure
+## Anti-Patterns
 
-**This file (SKILL.md)**: Core workflow and principles
+❌ **Pre-planned pipelines**: "Do A, then B, then C"
+- Violates hypothesis-driven learning
 
-**REFERENCE.md**: Detailed patterns, examples, troubleshooting
-- Load when user asks for examples
-- Load when encountering errors
-- Load for complex multi-HTK scenarios
+❌ **Skipping tracer bullets**: Optimizing unproven architecture
+- Risk: Building on sand
+
+❌ **Multiple HTKs at once**: Defining HTK #2 before HTK #1 completes
+- You don't know what #1 will teach you
 
 ## Examples
 
-### Example 1: Simple HTK
+### Example 1: Tracer Bullet First (Low Certainty)
 ```
-User: "Let's test if Redis caching improves API performance"
+User: "Build real-time notifications"
 
-Skill activates → mode: auto (narrow) → calls /htk-create
+Skill activates → assess certainty: LOW (never built WebSocket infra)
+→ First HTK is tracer bullet
 
-HTK:
-Goal: Validate Redis caching impact on GET /users/:id latency
+HTK: tracer-ws-path
+Goal: Prove WebSocket data can flow server → client
 
-Hypothesis: If we add Redis cache layer, p95 latency drops below 100ms
+Hypothesis: If we build minimal Socket.io POC, message reaches client in <500ms
 
 Test:
-* Change: Add Redis cache to user endpoint only
-* Method: Update endpoint, add cache middleware, deploy to staging
-* Rollback: git revert <commit>
+* Change: Create experiments/ws-tracer/ with server + test client
+* Method: Local server, single browser, 10 test messages
+* Rollback: rm -rf experiments/ws-tracer/
 
 Verify:
-* Metric: p95 latency < 100ms (k6 load test, 100 RPS, 1min)
-* Evidence: experiments/redis-cache/k6-results.json
+* Metric: 10/10 delivered, p95 < 500ms
+* Evidence: experiments/ws-tracer/delivery-log.json
 
 Decision:
-* Pass → Add cache to remaining GET endpoints
-* Fail → Profile slow queries → Optimize DB first → Retest cache
+* Pass → HTK on scaling (100 connections? 1000?)
+* Fail → Identify blocker → Evaluate alternatives (SSE, polling)
 
-Why first: Users report slow response times; caching is low-risk, high-impact win.
+Why first: Unproven architecture; validate path before optimizing.
 ```
 
-### Example 2: FOCUS → HTK
+### Example 2: Direct HTK (High Certainty)
+```
+User: "Reduce API latency"
+
+Skill activates → assess certainty: HIGH (existing production API)
+→ Direct HTK (no tracer needed)
+
+HTK: profile-bottleneck
+Goal: Identify actual bottleneck before optimizing
+
+Hypothesis: If we profile traffic, we identify component consuming >50% latency
+
+...
+
+Decision:
+* Pass (DB >50%) → HTK on caching or query optimization
+* Pass (Serialization >50%) → HTK on faster serializer
+* Fail → HTK on distributed tracing
+
+Why first: Optimizing without profiling is guessing.
+```
+
+### Example 3: FOCUS → HTK
 ```
 User: "We need to improve the onboarding experience"
 
@@ -228,6 +281,8 @@ Options:
 Chosen: reduce-friction
 
 Then calls /htk-create for first hypothesis...
+
+After that HTK completes, decide next based on what we learned.
 ```
 
 See [REFERENCE.md](./REFERENCE.md) for comprehensive examples and patterns.

@@ -17,6 +17,76 @@ This file contains global instructions that Claude Code will follow across all p
 - Progressive disclosure in documentation
 - Security-first approach (tenant isolation, auth)
 
+## No Untested Changes
+
+**Every code change MUST be verified before considering it complete.**
+
+### The Rule:
+- Write or update tests BEFORE or WITH the change, never after as an afterthought
+- Run the relevant test suite after making changes
+- If tests don't exist, create them; if they can't be created, explain why and get approval
+- "It works on my machine" is not verification—automated tests are
+
+### Verification Hierarchy:
+1. **Unit tests** — For functions, classes, modules
+2. **Integration tests** — For component interactions, API contracts
+3. **E2E tests** — For critical user paths
+4. **Manual verification** — Only when automated testing is impossible (document why)
+
+### What Counts as Verification:
+- ✅ Test suite passes (pytest, jest, etc.)
+- ✅ Type checker passes (mypy, tsc)
+- ✅ Linter passes (ruff, eslint)
+- ✅ Build succeeds
+- ✅ Specific manual check with documented steps and result
+
+### What Does NOT Count:
+- ❌ "The code looks right"
+- ❌ "It should work"
+- ❌ "I'll test it later"
+- ❌ Assuming existing tests cover the change without running them
+
+## Pragmatic Flexibility (Code Design)
+
+**Core Principle: Parameterize, don't hardcode. Configure, don't duplicate.**
+
+### When Implementing Features:
+
+1. **Parameterize variants** — If tempted to create `/getCSV`, create `/get?format=csv` instead
+2. **Config over conditionals** — Move environment-specific logic to config objects, not `if (prod)` checks
+3. **Layers over views** — Don't duplicate pipelines; point shared layers at different sources, mux at aggregation
+4. **Check the ripple radius** — When changing one thing, how many files must change? Minimize coupling
+5. **Tell, Don't Ask** — Don't extract→transform→push back; make objects do the work
+
+### When Handling Data:
+
+- Externalize test fixtures and expected results (not inline in test code)
+- Put policy (timeouts, thresholds, feature flags) in config; put invariants in code
+- Validate at system boundaries; trust internal contracts
+- No raw globals—if something must be global, wrap it in an API
+
+### When Handling Errors:
+
+- **Crash early** with clear messages > limp along in undefined state
+- **Assert "impossible" conditions** explicitly—if you think "can't happen," check it
+- Surface errors visibly; never swallow silently
+
+### Anti-Patterns to Reject:
+
+- ❌ Hardcoded URLs, credentials, magic numbers inline
+- ❌ Copy-paste-modify instead of extracting the variable axis
+- ❌ Relying on properties you can't control (phone numbers as IDs, external state assumptions)
+- ❌ Leaving broken code "for now" without boarding up
+- ❌ Chaining long method calls (`order.customer.address.city`)
+- ❌ Deep inheritance hierarchies when composition works
+
+### Decision Heuristic:
+
+Before implementing, ask: **"How would someone change this in 6 months?"**
+- If the answer involves touching many files → decouple more
+- If the answer is "they'd duplicate this code" → parameterize the variant
+- If the answer is "they'd change this constant" → externalize to config
+
 ## Plan Grounding Requirements
 
 **Before creating implementation plans, verify environmental grounding:**
