@@ -65,6 +65,14 @@ Review the conversation history and identify:
    - CLAUDE.md additions for common patterns
    - REFERENCE.md clarifications
 
+7. **Project Enhancements** (Code-Level Improvements)
+   - Tech debt discovered during this session
+   - Code smells or refactoring opportunities
+   - Feature ideas that emerged from the work
+   - Performance improvements identified
+   - Testing gaps discovered
+   - API/schema design improvements
+
 ## Compression Strategy
 
 **Keep (Priority Order):**
@@ -176,6 +184,44 @@ Before listing improvements, determine the correct destination:
 - [ ] No existing skill covers this domain
 → If yes to all: Update CLAUDE.md: [one-line rule]
 → If no: Route to appropriate REFERENCE.md instead
+
+## Project Enhancements (Code-Level Work)
+
+### Tech Debt Discovered
+*(Code smells, workarounds, design issues found during this session)*
+
+| Issue | Location | Impact | Suggested Fix |
+|-------|----------|--------|---------------|
+| [Issue name] | `path/to/file.py` | [high/medium/low] | [Brief fix description] |
+
+**Recommended GitHub Labels:** `tech-debt`, `refactor`, `code-quality`
+
+### Feature Ideas
+*(New capabilities or improvements that emerged from this work)*
+
+- [ ] **[Feature name]**: [Description] - Priority: [P0/P1/P2]
+  - Files affected: [list]
+  - Complexity: [small/medium/large]
+
+### Refactoring Opportunities
+*(Structural improvements, not bug fixes)*
+
+- [ ] **[Refactor name]**: [Current state] → [Desired state]
+  - Motivation: [Why this matters]
+  - Approach: [High-level how]
+
+### Testing Gaps
+*(Missing test coverage discovered)*
+
+- [ ] [Component/function]: [What's not tested]
+
+### Action: Create GitHub Issues
+*(Mark items that should become GitHub issues for `/session:apply` to process)*
+
+For items marked with `→ GH ISSUE`, `/session:apply` will:
+1. Create GitHub issue with appropriate labels
+2. Link to this park document for context
+3. Track in `action-items.yaml` with `type: project-enhancement`
 
 ## Related Sessions
 - [YYYY-MM-DD-topic]: [how it relates]

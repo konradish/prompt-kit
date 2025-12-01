@@ -77,7 +77,8 @@ Check if suggested command already exists or fits in existing category.
 1. **Read Recent Park Documents**
    - Check `.claude-sessions/` for park documents from last 7 days
    - Extract all `.claude Improvements` sections
-   - Group suggestions by type: skills, commands, CLAUDE.md, REFERENCE.md
+   - **Extract all `Project Enhancements` sections** (tech debt, features, refactoring)
+   - Group suggestions by type: skills, commands, CLAUDE.md, REFERENCE.md, **github-issues**
 
 2. **Identify Patterns**
    - Count repeated suggestions (e.g., "forgot X 3 times")
@@ -103,11 +104,13 @@ items:
     description: string          # From park doc improvement
     source: string               # Park doc filename
     priority: P0|P1|P2           # Based on impact assessment
-    category: skill|command|claude-md|reference-md|other
+    category: skill|command|claude-md|reference-md|github-issue|tech-debt|feature|refactor|other
     slo_days: 7|14|30            # Based on priority
     created: YYYY-MM-DD          # Today's date
     due: YYYY-MM-DD              # created + slo_days
     status: pending              # Initial status
+    github_issue: null           # GitHub issue URL if created
+    files_affected: []           # For code-level items
 ```
 
 ### Deduplication Rules
@@ -191,6 +194,120 @@ Is it detailed technical reference?
 - Quick command references
 - **NOT detailed procedures or reference tables**
 - Keep under 100 lines - if over, REFUSE to add more
+
+## Project Enhancement Processing
+
+**CRITICAL: This is where code-level improvements from park documents get actioned.**
+
+### 1. Extract Project Enhancements
+
+From each park document's `## Project Enhancements` section, extract:
+
+| Section | What to Extract | Action |
+|---------|-----------------|--------|
+| Tech Debt Discovered | Code smells, workarounds | Create GH issue with `tech-debt` label |
+| Feature Ideas | New capabilities | Create GH issue with `enhancement` label |
+| Refactoring Opportunities | Structural improvements | Create GH issue with `refactor` label |
+| Testing Gaps | Missing coverage | Create GH issue with `testing` label |
+
+### 2. GitHub Issue Creation
+
+**For each item marked `→ GH ISSUE` or in Project Enhancements sections:**
+
+```bash
+# Create GitHub issue from park document insight
+gh issue create \
+  --title "[Type]: Brief description" \
+  --body "$(cat <<'EOF'
+## Context
+
+From session: `YYYY-MM-DD-topic-compressed.md`
+
+## Problem/Opportunity
+
+[Description from park document]
+
+## Suggested Approach
+
+[Approach from park document, if provided]
+
+## Files Affected
+
+- `path/to/file.py`
+
+## Priority
+
+[P0/P1/P2] - [Rationale]
+
+---
+*Auto-generated from park document by `/session:apply`*
+EOF
+)" \
+  --label "from-park-doc,[type-label]"
+```
+
+### 3. Issue Type → Label Mapping
+
+| Park Doc Section | GitHub Label(s) |
+|------------------|-----------------|
+| Tech Debt Discovered | `tech-debt`, `code-quality` |
+| Feature Ideas | `enhancement` |
+| Refactoring Opportunities | `refactor` |
+| Testing Gaps | `testing`, `test-coverage` |
+| Code Smells | `tech-debt`, `code-smell` |
+| Performance | `performance` |
+
+### 4. Update action-items.yaml for Project Items
+
+```yaml
+- id: ai-YYYY-MM-DD-NNN
+  description: "[Tech Debt] Refactor gemini_ai.py - class too large"
+  source: 2025-12-01-gemini-structured-output-compressed.md
+  priority: P1
+  category: tech-debt           # Use specific category
+  slo_days: 14
+  created: 2025-12-01
+  due: 2025-12-15
+  status: pending
+  github_issue: "https://github.com/org/repo/issues/123"  # Link to created issue
+  files_affected:
+    - backend/app/services/gemini_ai.py
+```
+
+### 5. Project Enhancement Decision Tree
+
+```
+Is this a code-level improvement (not documentation)?
+    │
+    ├─ YES → Does it involve code changes?
+    │        │
+    │        ├─ YES → Create GitHub Issue
+    │        │        │
+    │        │        ├─ Tech debt? → label: tech-debt
+    │        │        ├─ New feature? → label: enhancement
+    │        │        ├─ Refactor? → label: refactor
+    │        │        └─ Testing? → label: testing
+    │        │
+    │        └─ NO (planning/research) → Add to action-items.yaml only
+    │
+    └─ NO → Follow .claude improvement routing (skills/commands/docs)
+```
+
+### 6. Linking Issues to Park Documents
+
+When creating GitHub issues:
+1. Always reference the source park document in the issue body
+2. Include the "Files Affected" section for context
+3. Add `from-park-doc` label to track origin
+4. Update action-items.yaml with the issue URL
+
+### 7. When NOT to Create GitHub Issues
+
+Skip issue creation if:
+- Item is too vague (no clear actionable scope)
+- Item is already tracked in an existing issue
+- Item is documentation-only (use `.claude` improvements instead)
+- Item is a one-time task already completed
 
 ## Execution Workflow
 
@@ -313,6 +430,21 @@ Generate comprehensive report:
 **CLAUDE.md Updates (One-Liners Only):**
 - [section]: [one-line rule added] *(only if CLAUDE.md < 80 lines)*
 
+### Project Enhancements Processed
+
+#### GitHub Issues Created
+| Issue | Type | Priority | Labels |
+|-------|------|----------|--------|
+| [#123: Issue title](url) | tech-debt | P1 | `tech-debt`, `from-park-doc` |
+| [#124: Issue title](url) | feature | P2 | `enhancement`, `from-park-doc` |
+
+#### Tracked for Future Work
+*(Items added to action-items.yaml but not yet as GitHub issues)*
+
+| Item | Category | Priority | Files Affected |
+|------|----------|----------|----------------|
+| [Description] | refactor | P2 | `path/to/file.py` |
+
 ### Patterns Detected
 - [Pattern]: Occurred in X sessions → [Action taken]
 
@@ -320,9 +452,18 @@ Generate comprehensive report:
 - [Item]: [Why deferred] → Added to action-items.yaml as P2
 
 ### Recommendations
-1. [Most impactful next action]
+
+**Documentation Improvements:**
+1. [Most impactful .claude change]
+2. [Second priority]
+
+**Project Enhancements:**
+1. [Most impactful code-level improvement]
 2. [Second priority]
 3. [Third priority]
+
+**Suggested Next Session Focus:**
+Based on parked items, consider working on: [highest-priority actionable item]
 
 ### ⚠️ CLAUDE.md Health Check
 *(Include if CLAUDE.md > 80 lines)*
@@ -357,6 +498,7 @@ Generate comprehensive report:
 
 ## Success Criteria
 
+### Documentation Improvements
 - [ ] Overdue items reported prominently
 - [ ] CLAUDE.md size checked BEFORE applying anything
 - [ ] Existing skills discovered and used for routing
@@ -368,8 +510,20 @@ Generate comprehensive report:
 - [ ] Metrics updated accurately
 - [ ] Re-routing decisions documented in report
 
+### Project Enhancements
+- [ ] `Project Enhancements` sections extracted from park docs
+- [ ] Tech debt items identified and categorized
+- [ ] GitHub issues created for actionable items (with user approval)
+- [ ] Issues linked back to source park document
+- [ ] action-items.yaml updated with `github_issue` URLs
+- [ ] `from-park-doc` label used for traceability
+- [ ] Files affected listed in issues for context
+- [ ] Suggested next session focus provided
+
 ## Important Notes
 
+- **Process BOTH `.claude` improvements AND project enhancements** - Don't skip code-level work
+- **Ask before creating GitHub issues** - Get user approval for issue creation
 - **Check CLAUDE.md size FIRST** - If > 200 lines, route everything to REFERENCE.md
 - **Discover existing skills FIRST** - Don't create new when existing skill covers the domain
 - **CLAUDE.md is for one-liners only** - "Always X", "Never Y", not detailed reference
