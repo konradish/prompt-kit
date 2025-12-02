@@ -137,6 +137,34 @@ When possible, send multiple independent tool calls in a single message rather t
 - Tasks touch different files/layers → Default to parallel
 - If uncertain about dependencies → Ask user before choosing parallel/sequential
 
+## Windows Chrome Automation (WSL2)
+
+**Browser automation** from WSL2 via Chrome DevTools Protocol. Project: `C:\projects\chrome-automation`
+
+### Commands (auto port, auto profile lookup)
+```bash
+# Launch (returns JSON with port, wsEndpoint)
+powershell.exe -Command "cd C:\projects\chrome-automation; node scripts/chrome-launcher.mjs --profile=schoolbrain 'https://url'"
+
+# List tabs (auto-discovers port from state)
+powershell.exe -Command "cd C:\projects\chrome-automation; node scripts/multi-tab.mjs --action=list-tabs"
+
+# Parallel screenshots
+powershell.exe -Command "cd C:\projects\chrome-automation; node scripts/multi-tab.mjs --action=parallel-screenshots --urls='url1,url2'"
+
+# Kill by profile (cleans up state)
+powershell.exe -Command "cd C:\projects\chrome-automation; node scripts/chrome-kill.mjs --profile=schoolbrain"
+```
+
+### Profiles
+| Profile | Description |
+|---------|-------------|
+| `schoolbrain` | Google OAuth for SchoolBrain testing |
+| `default` | Clean browser |
+
+### State File
+`.chrome-instances.json` tracks running instances (port, wsEndpoint). Scripts auto-discover.
+
 ## Project-Specific Configurations
 
 Add your own project-specific configurations below. Examples:
