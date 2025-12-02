@@ -34,3 +34,10 @@ claude-config/commands/workspace/scan-env-*/
 
 # Project .claude local overrides (personal settings)
 .claude/settings.local.json
+
+# Chrome automation (browser profiles contain credentials, cache)
+chrome-automation/node_modules/
+chrome-automation/profiles/
+chrome-automation/output/
+chrome-automation/.chrome-instances.json
+chrome-automation/package-lock.json

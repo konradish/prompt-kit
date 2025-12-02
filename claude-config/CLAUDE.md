@@ -139,21 +139,21 @@ When possible, send multiple independent tool calls in a single message rather t
 
 ## Windows Chrome Automation (WSL2)
 
-**Browser automation** from WSL2 via Chrome DevTools Protocol. Project: `C:\projects\chrome-automation`
+**Browser automation** from WSL2 via Chrome DevTools Protocol. Project: `C:\projects\prompt-kit\chrome-automation`
 
 ### Commands (auto port, auto profile lookup)
 ```bash
 # Launch (returns JSON with port, wsEndpoint)
-powershell.exe -Command "cd C:\projects\chrome-automation; node scripts/chrome-launcher.mjs --profile=schoolbrain 'https://url'"
+powershell.exe -Command "cd C:\projects\prompt-kit\chrome-automation; node scripts/chrome-launcher.mjs --profile=schoolbrain 'https://url'"
 
 # List tabs (auto-discovers port from state)
-powershell.exe -Command "cd C:\projects\chrome-automation; node scripts/multi-tab.mjs --action=list-tabs"
+powershell.exe -Command "cd C:\projects\prompt-kit\chrome-automation; node scripts/multi-tab.mjs --action=list-tabs"
 
 # Parallel screenshots
-powershell.exe -Command "cd C:\projects\chrome-automation; node scripts/multi-tab.mjs --action=parallel-screenshots --urls='url1,url2'"
+powershell.exe -Command "cd C:\projects\prompt-kit\chrome-automation; node scripts/multi-tab.mjs --action=parallel-screenshots --urls='url1,url2'"
 
 # Kill by profile (cleans up state)
-powershell.exe -Command "cd C:\projects\chrome-automation; node scripts/chrome-kill.mjs --profile=schoolbrain"
+powershell.exe -Command "cd C:\projects\prompt-kit\chrome-automation; node scripts/chrome-kill.mjs --profile=schoolbrain"
 ```
 
 ### Profiles
