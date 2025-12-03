@@ -26,6 +26,39 @@ Use this template when scoping a new request for an LLM so you capture constrain
 2. Assign owner or agent role for each step if applicable.
 3. List checkpoints to validate progress early.
 
+## 5b. Intermediate Packets
+
+Large projects stall because they feel unbounded. Break work into **shareable chunks** that accelerate progress.
+
+### Define Packets (Before Starting)
+
+For each major piece of work, define 3-5 packets:
+
+| Packet | Description | Consumer | Time Estimate |
+|--------|-------------|----------|---------------|
+| 1 | [Smallest deliverable] | [Who uses this?] | ≤2 hours |
+| 2 | [Next deliverable] | [Who uses this?] | ≤2 hours |
+| 3 | [Next deliverable] | [Who uses this?] | ≤2 hours |
+
+**Rules:**
+- Each packet must have a named **consumer** (project, decision, person, or next packet)
+- Packets without consumers are dead work — cut them
+- Share first packet before building second (feedback shortens cycles)
+
+### Packet Types
+
+- **Draft**: Rough version for feedback (e.g., wireframe, API sketch)
+- **Spike**: Technical proof-of-concept (e.g., "can we connect to X?")
+- **Slice**: Vertical slice of functionality (e.g., one complete feature path)
+- **Stub**: Interface without implementation (e.g., types, mock endpoints)
+
+### Orphan Audit (Weekly)
+
+Ask for each artifact:
+> "What project, decision, or note will consume this? If none — why keep it alive?"
+
+Archive or delete orphaned packets.
+
 ## 6. Risks & Mitigations
 - Potential blockers or unknowns.
 - Early warning signs to watch for.
