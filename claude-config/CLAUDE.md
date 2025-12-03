@@ -57,6 +57,7 @@ This file contains global instructions that Claude Code will follow across all p
 3. **Layers over views** — Don't duplicate pipelines; point shared layers at different sources, mux at aggregation
 4. **Check the ripple radius** — When changing one thing, how many files must change? Minimize coupling
 5. **Tell, Don't Ask** — Don't extract→transform→push back; make objects do the work
+6. **Containment test** — Can a newcomer draw the part-whole hierarchy in 2 minutes? If not, the abstraction fights cognition
 
 ### When Handling Data:
 

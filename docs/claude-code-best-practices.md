@@ -227,10 +227,28 @@ allowed-tools: All
 - [ ] Documentation updated
 ```
 
-### Model Selection
-- **sonnet**: Most agents (balance of speed and capability)
-- **opus**: Complex architectural decisions
-- **haiku**: Simple, repetitive tasks
+### Model Selection (AI Leverage Modes)
+
+**Default Pattern**: Start with Sonnet. Escalate to Opus only when hitting capability limits.
+
+| Task Type | Model | Rationale |
+|-----------|-------|-----------|
+| Multi-file refactor | Sonnet | Best coding model, faster, cheaper |
+| Routine coding | Sonnet | 30+ hours coherent autonomy |
+| Ambiguous architecture | Opus | Handles tradeoffs without hand-holding |
+| Agent meta-design | Opus (medium effort) | Complex reasoning, token-efficient |
+| Long-horizon autonomous | Opus | Better on agentic benchmarks |
+| Volume conversations | Sonnet or Haiku | Cost efficiency |
+
+**Escalate to Opus when:**
+- Sonnet struggles with ambiguity
+- Task requires sustained multi-step reasoning across systems
+- You need tradeoff analysis without hand-holding
+
+**Effort Parameter (API):**
+- **Low**: Fast drafts, lower quality
+- **Medium**: Matches Sonnet quality, 76% fewer tokens
+- **High** (default): Maximum quality
 
 ---
 
@@ -255,6 +273,49 @@ allowed-tools: All
 - Agents should know which skills to use
 - Avoid circular dependencies
 - Pass context explicitly when delegating
+
+---
+
+## Four Edges Filter
+
+Before adding any new skill, command, or document, pass through these gates:
+
+### 1. Ship Ugly
+Can I release a crude version to one real user today?
+- If yes → proceed with minimal viable version
+- If no → why not? (Often reveals scope creep)
+
+### 2. Anchor to a Who
+Who becomes freer because this exists? Name them.
+- If you can name a person → the work is grounded
+- If you can't → you're feeding architecture, not outcomes
+
+### 3. Delete Before Add
+What existing doc/skill/command does this replace or subsume?
+- Identify redundancy before creating
+- Every addition must justify its place in a lean ecosystem
+
+### 4. Containment Test
+Can a newcomer draw the part-whole hierarchy in 2 minutes?
+
+**The Exercise:**
+1. Hand someone the skill/doc/system description
+2. Give them 2 minutes and a blank paper
+3. Ask: "Draw what contains what"
+
+**Pass criteria:**
+- They can draw boxes-in-boxes showing containment
+- They know where to "point" to find each part
+- No circular arrows or "it depends" confusion
+
+**If they can't → your abstraction fights cognition. Simplify before shipping.**
+
+**Common fixes:**
+- Flatten unnecessary nesting
+- Rename ambiguous containers
+- Add a 3-line ASCII diagram to the doc
+
+**If no clear answers → stop and clarify before proceeding.**
 
 ---
 
