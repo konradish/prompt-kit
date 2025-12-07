@@ -35,13 +35,13 @@ wc -l CLAUDE.md
 
 | Lines | Status | Action |
 |-------|--------|--------|
-| < 150 | 🟢 OK | Can add one-liner rules if appropriate |
-| 150-200 | 🟡 Warning | Prefer REFERENCE.md for new content |
-| > 200 | 🔴 Overflow | **REFUSE** to add to CLAUDE.md, route all to REFERENCE.md |
+| < 225 | 🟢 OK | Can add one-liner rules if appropriate |
+| 225-300 | 🟡 Warning | Prefer REFERENCE.md for new content |
+| > 300 | 🔴 Overflow | **REFUSE** to add to CLAUDE.md, route all to REFERENCE.md |
 
-**If CLAUDE.md > 200 lines:**
+**If CLAUDE.md > 300 lines:**
 ```markdown
-⚠️ CLAUDE.md OVERFLOW (X lines > 200 limit)
+⚠️ CLAUDE.md OVERFLOW (X lines > 300 limit)
 
 All improvements will be routed to appropriate REFERENCE.md files.
 Consider refactoring CLAUDE.md - move detailed sections to skills/.
@@ -466,9 +466,9 @@ Generate comprehensive report:
 Based on parked items, consider working on: [highest-priority actionable item]
 
 ### ⚠️ CLAUDE.md Health Check
-*(Include if CLAUDE.md > 80 lines)*
+*(Include if CLAUDE.md > 225 lines)*
 
-**Current size:** X lines (limit: 100)
+**Current size:** X lines (limit: 300)
 **Status:** 🔴 OVERFLOW / 🟡 WARNING / 🟢 OK
 
 **If overflow, recommend:**
@@ -524,7 +524,7 @@ Based on parked items, consider working on: [highest-priority actionable item]
 
 - **Process BOTH `.claude` improvements AND project enhancements** - Don't skip code-level work
 - **Ask before creating GitHub issues** - Get user approval for issue creation
-- **Check CLAUDE.md size FIRST** - If > 200 lines, route everything to REFERENCE.md
+- **Check CLAUDE.md size FIRST** - If > 300 lines, route everything to REFERENCE.md
 - **Discover existing skills FIRST** - Don't create new when existing skill covers the domain
 - **CLAUDE.md is for one-liners only** - "Always X", "Never Y", not detailed reference
 - **REFERENCE.md is for details** - Configs, IDs, procedures, examples
