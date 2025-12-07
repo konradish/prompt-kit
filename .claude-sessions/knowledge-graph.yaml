@@ -32,6 +32,30 @@ entities:
     first_seen: 2025-11-28
     last_updated: 2025-11-28
 
+  - name: chrome-automation
+    type: component
+    sessions:
+      - 2025-12-07-chrome-automation-docs-compressed.md
+    keywords: [chrome, cdp, puppeteer, wsl2, windows, automation, browser]
+    first_seen: 2025-12-07
+    last_updated: 2025-12-07
+
+  - name: wsl2-windows-bridge
+    type: pattern
+    sessions:
+      - 2025-12-07-chrome-automation-docs-compressed.md
+    keywords: [wsl2, powershell, cross-platform, bridge, windows]
+    first_seen: 2025-12-07
+    last_updated: 2025-12-07
+
+  - name: mcp-alternative
+    type: pattern
+    sessions:
+      - 2025-12-07-chrome-automation-docs-compressed.md
+    keywords: [mcp, server, daemon, on-demand, state-file]
+    first_seen: 2025-12-07
+    last_updated: 2025-12-07
+
 relationships:
   - from: 2025-11-28-claude-md-line-limit-update-compressed.md
     to: claude-md-standards
@@ -44,3 +68,15 @@ relationships:
     type: builds_on
     strength: medium
     context: "Uses park workflow established in earlier session"
+
+  - from: 2025-12-07-chrome-automation-docs-compressed.md
+    to: chrome-automation
+    type: implements
+    strength: high
+    context: "Documented architecture and purpose of chrome-automation"
+
+  - from: 2025-12-07-chrome-automation-docs-compressed.md
+    to: mcp-alternative
+    type: implements
+    strength: medium
+    context: "Documented state-file pattern as MCP server alternative"

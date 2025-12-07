@@ -23,3 +23,27 @@ lessons:
     interval_days: 7
     times_surfaced: 0
     times_applied: 0
+
+  - id: lesson-2025-12-07-001
+    source: 2025-12-07-chrome-automation-docs-compressed.md
+    lesson: "ASCII architecture diagrams effectively explain cross-system boundaries (WSL2↔Windows, browser↔server)."
+    category: workflow
+    impact: medium
+    keywords: [documentation, diagrams, architecture, wsl2, cross-boundary]
+    last_surfaced: null
+    surface_after: 2025-12-14
+    interval_days: 7
+    times_surfaced: 0
+    times_applied: 0
+
+  - id: lesson-2025-12-07-002
+    source: 2025-12-07-chrome-automation-docs-compressed.md
+    lesson: "State file pattern (.json tracking daemon PIDs/ports) enables on-demand scripts without persistent server."
+    category: architecture
+    impact: medium
+    keywords: [state-file, daemon, mcp, chrome, automation]
+    last_surfaced: null
+    surface_after: 2025-12-14
+    interval_days: 7
+    times_surfaced: 0
+    times_applied: 0
