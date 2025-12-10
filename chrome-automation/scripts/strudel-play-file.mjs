@@ -4,9 +4,18 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default async function({ browser, pages, page }) {
+export default async function({ browser, pages, page: defaultPage }) {
   const patternFile = process.argv[3] || path.join(__dirname, 'pattern.txt');
   const pattern = fs.readFileSync(patternFile, 'utf-8').trim();
+
+  // Find the Strudel tab
+  let page = pages.find(p => p.url().includes('strudel.cc'));
+  if (!page) {
+    throw new Error('Strudel tab not found. Open https://strudel.cc first.');
+  }
+
+  // Bring the Strudel tab to front
+  await page.bringToFront();
 
   // Click on editor
   await page.click('.cm-content');
