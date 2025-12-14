@@ -5,6 +5,39 @@
 
 ---
 
+## When to Use HTK vs Direct Work
+
+**Use full HTK ceremony when:**
+- Architectural hypothesis ("will this pattern work?")
+- Multiple valid approaches exist
+- Outcome genuinely uncertain
+- Requires explicit rollback plan
+- Repo lacks test coverage (uninitialized or untested)
+
+**Skip HTK (direct codebase work OK) when:**
+- Tests exist and can catch regressions
+- Single-file, isolated change
+- Pattern already proven in this codebase
+- No measurable hypothesis needed
+- Change reversible in <30 seconds
+
+**Decision heuristic:**
+```
+Is repo initialized with tests + CI?
+  NO  → Use HTK (you need the safety)
+  YES ↓
+
+Is change reversible in <30 seconds?
+  NO  → Use HTK ceremony
+  YES ↓
+
+Are there multiple valid approaches?
+  YES → Use HTK to test hypothesis
+  NO  → Direct work OK
+```
+
+---
+
 ## Modes
 
 * `auto`: if input is broad → do **FOCUS** then **HTK**; if narrow → **HTK** only.

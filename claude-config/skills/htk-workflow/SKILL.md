@@ -14,6 +14,20 @@ Guide developers through hypothesis-driven development using the FOCUS + HTK met
 - **Tracer Bullet**: Thin end-to-end skeleton when architecture is unproven
 - **Version Hygiene**: Keep main branch green, commit artifacts even on failure
 
+## When to Use HTK vs Direct Work
+
+**Use full HTK ceremony when:**
+- Architectural hypothesis ("will this pattern work?")
+- Multiple valid approaches exist
+- Outcome genuinely uncertain
+- Repo lacks test coverage
+
+**Skip HTK (direct codebase work OK) when:**
+- Tests exist and can catch regressions
+- Single-file, isolated change
+- Pattern already proven in this codebase
+- Change reversible in <30 seconds
+
 ## Core Principles
 
 1. **Change one thing** - Single variable per test
@@ -128,7 +142,7 @@ Same structure, but:
 - **Fail**: Hard blocker discovered early → pivot or stop
 
 #### For scope:
-Call `/htk-plan` (now `/htk-scope`) to set north star + stop rules + first HTK
+Call `/htk-scope` to set north star + stop rules + first HTK
 
 #### For execution:
 Call `/htk-run-next` with version hygiene steps
@@ -172,13 +186,20 @@ After each HTK completes:
 
 **Never pre-plan sequences.** Each HTK informs the next.
 
-## Integration with Commands
+## Skill/Command Architecture
+
+**This skill orchestrates; commands execute.**
+
+The skill auto-activates on keywords and determines which command to invoke based on context. Commands are atomic operations that can also be called directly. This separation allows:
+- Flexible entry points (keyword triggers OR explicit commands)
+- Composable primitives (commands can be chained)
+- Clear responsibility (skill = routing, commands = execution)
 
 | Command | Purpose | When |
 |---------|---------|------|
 | `/htk-focus` | Generate FOCUS options | Broad/unclear input |
 | `/htk-create` | Create single HTK | Clear hypothesis |
-| `/htk-plan` | Set scope (north star + stop rules + first HTK) | Starting new initiative |
+| `/htk-scope` | Set north star + stop rules + first HTK | Starting new initiative |
 | `/htk-run-next` | Execute current HTK | Ready to test |
 | `/htk-summarize` | Rollup learnings, propose next HTK | After HTK completes |
 
