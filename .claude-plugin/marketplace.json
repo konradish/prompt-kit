@@ -1,0 +1,22 @@
+{
+  "name": "prompt-kit",
+  "description": "Reusable patterns, skills, and tools for Claude Code - extracted wisdom for new voyages",
+  "owner": {
+    "name": "konradish",
+    "url": "https://github.com/konradish"
+  },
+  "plugins": [
+    {
+      "name": "research-prompts",
+      "source": "./plugins/research-prompts",
+      "description": "Discovery over documentation - research prompts that find codebase truth",
+      "version": "1.0.0"
+    },
+    {
+      "name": "python-web-stack",
+      "source": "./plugins/python-web-stack",
+      "description": "FastAPI + Docker Compose + Make patterns for Python web development",
+      "version": "1.0.0"
+    }
+  ]
+}

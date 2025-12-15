@@ -1,0 +1,24 @@
+{
+  "name": "python-web-stack",
+  "version": "1.0.0",
+  "description": "FastAPI + Docker Compose + Make patterns for Python web development. Extracted from SchoolBrain - the rutter for your next voyage.",
+  "author": {
+    "name": "konradish",
+    "url": "https://github.com/konradish"
+  },
+  "homepage": "https://github.com/konradish/prompt-kit/tree/main/plugins/python-web-stack",
+  "repository": "https://github.com/konradish/prompt-kit",
+  "license": "MIT",
+  "keywords": [
+    "fastapi",
+    "docker-compose",
+    "make",
+    "python",
+    "uv",
+    "wsl",
+    "local-dev",
+    "validation"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/"
+}
