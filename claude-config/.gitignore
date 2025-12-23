@@ -1,0 +1,20 @@
+# Private content (symlinked from private repo)
+skills/private
+commands/private
+CLAUDE-PRIVATE.md
+
+# Runtime/cache files (already should be ignored)
+.credentials.json
+settings.json
+settings.local.json
+history.jsonl
+stats-cache.json
+statsig/
+telemetry/
+session-env/
+shell-snapshots/
+debug/
+todos/
+file-history/
+plans/
+local/
