@@ -10,11 +10,21 @@
  *   node cli.mjs clear                     - Clear cookies + localStorage
  *   node cli.mjs screenshot [--output=file] - Take screenshot
  *   node cli.mjs wait <text> [--timeout=5000] - Wait for text on page
+ *   node cli.mjs config                    - Show connection config (WSL/port info)
+ *   node cli.mjs setup                     - Configure WSL port forwarding (one-time)
+ *
+ * Environment Variables:
+ *   CHROME_DEBUG_PORT   - Override default Chrome debug port (default: 9223)
+ *
+ * WSL/Windows Compatibility:
+ *   Automatically detects WSL and uses Windows host IP from /etc/resolv.conf.
+ *   For WSL2, run 'node cli.mjs setup' once to configure port forwarding.
+ *   Falls back to localhost for native Windows or mirrored networking mode.
  *
  * Output: Always JSON { success: true, data: ... } or { success: false, error: "..." }
  */
 
-import { launch, getConnection, disconnect } from './lib/connection.mjs';
+import { launch, getConnection, disconnect, getConnectionConfig, setupWSLPortForwarding } from './lib/connection.mjs';
 import { clickByText, navigate, clear } from './lib/actions.mjs';
 import { getState, screenshot, waitForText, evaluate } from './lib/queries.mjs';
 
@@ -205,6 +215,73 @@ const commands = {
     return result;
   },
 
+  async config() {
+    const config = getConnectionConfig();
+    let wslNote = null;
+
+    if (config.isWSL) {
+      // Test if we can connect directly or need PowerShell workaround
+      try {
+        const response = await fetch(`http://${config.hostIP}:${config.defaultPort}/json/version`, {
+          signal: AbortSignal.timeout(2000)
+        });
+        wslNote = 'Direct WSL connection available (mirrored networking or port forwarding working)';
+      } catch {
+        wslNote = 'WSL2 network isolation detected. Use PowerShell wrapper or enable mirrored networking.';
+      }
+    }
+
+    const cwd = process.cwd().replace(/\//g, '\\').replace('\\mnt\\c', 'C:');
+    return {
+      success: true,
+      config: {
+        ...config,
+        wslConnectivity: wslNote
+      },
+      env: {
+        CHROME_DEBUG_PORT: process.env.CHROME_DEBUG_PORT || '(not set)'
+      },
+      help: config.isWSL
+        ? `Running in WSL2. For best results, run via PowerShell:\n  powershell.exe -Command "cd '${cwd}'; node cli.mjs <command>"`
+        : `Running natively. Will connect to Chrome at localhost:${config.defaultPort}`
+    };
+  },
+
+  async setup() {
+    const config = getConnectionConfig();
+
+    if (!config.isWSL) {
+      return {
+        success: true,
+        message: 'Not running in WSL - no setup needed. Chrome localhost connections work natively.'
+      };
+    }
+
+    // Try to set up port forwarding
+    const result = await setupWSLPortForwarding(config.defaultPort);
+
+    if (result.success) {
+      return {
+        success: true,
+        message: result.reason === 'already_configured'
+          ? `Port forwarding already configured for port ${config.defaultPort}`
+          : `Port forwarding configured for port ${config.defaultPort}`,
+        nextStep: `Chrome debug port ${config.defaultPort} should now be accessible from WSL. Try 'node cli.mjs launch <url>'`
+      };
+    } else {
+      return {
+        success: false,
+        error: 'Port forwarding requires administrator privileges',
+        manualCommand: result.command,
+        instructions: [
+          '1. Open PowerShell as Administrator on Windows',
+          `2. Run: ${result.command}`,
+          '3. Retry the CLI command'
+        ]
+      };
+    }
+  },
+
   async help() {
     return {
       success: true,
@@ -215,7 +292,12 @@ const commands = {
         'eval <script>': 'Run JS in page, return result',
         'clear': 'Clear cookies + localStorage',
         'screenshot [--output=file]': 'Take screenshot (base64 or save to file)',
-        'wait <text> [--timeout=5000]': 'Wait for text to appear on page'
+        'wait <text> [--timeout=5000]': 'Wait for text to appear on page',
+        'config': 'Show connection config (WSL detection, port, host)',
+        'setup': 'Configure WSL port forwarding for Chrome access (run once)'
+      },
+      envVars: {
+        'CHROME_DEBUG_PORT': 'Override default Chrome debug port (default: 9223)'
       }
     };
   }
