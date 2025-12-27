@@ -17,6 +17,12 @@
       "source": "./plugins/python-web-stack",
       "description": "FastAPI + Docker Compose + Make patterns for Python web development",
       "version": "1.0.0"
+    },
+    {
+      "name": "wsl-chrome-bridge",
+      "source": "./plugins/wsl-chrome-bridge",
+      "description": "Bridge WSL2 Claude to Windows Chrome for UI validation and browser automation",
+      "version": "1.0.0"
     }
   ]
 }
