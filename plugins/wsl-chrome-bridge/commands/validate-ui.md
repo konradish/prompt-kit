@@ -3,7 +3,7 @@ name: validate-ui
 description: Validate UI via Windows Chrome from WSL
 arguments:
   - name: url
-    description: URL to validate (optional, uses localhost:3000 if not provided)
+    description: URL to validate (e.g., http://myapp.localhost, https://myapp.example.com)
     required: false
 ---
 
@@ -19,7 +19,10 @@ Invokes Windows Claude with Chrome integration to validate a web UI.
 
 ## Arguments
 
-- `url` (optional): The URL to validate. Defaults to `http://localhost:3000`
+- `url` (optional): The URL to validate. Examples:
+  - `http://myapp.localhost` (local via Traefik)
+  - `http://api.myapp.localhost` (local API)
+  - `https://myapp-dev.example.com` (staging)
 
 ## Execution
 
@@ -41,12 +44,15 @@ When this command is invoked:
 Execute the following to validate the UI:
 
 ```bash
-URL="${1:-http://localhost:3000}"
+URL="${1}"
 
-# Check if URL uses localhost - may need LAN IP for Chrome access
-if [[ "$URL" == *"localhost"* ]]; then
-    echo "Note: localhost may require domain approval in Claude in Chrome."
-    echo "If validation fails, try using your machine's LAN IP instead."
+# If no URL provided, prompt user
+if [[ -z "$URL" ]]; then
+    echo "No URL provided. Examples:"
+    echo "  - http://myapp.localhost (local via Traefik)"
+    echo "  - https://myapp-dev.example.com (staging)"
+    echo "Please provide a URL to validate."
+    exit 1
 fi
 
 # Invoke Windows Claude with Chrome
@@ -84,7 +90,7 @@ echo "$RESULT"
 ## Example Output
 
 ```
-## UI Validation Report: http://localhost:3000
+## UI Validation Report: http://myapp.localhost
 
 ### Page Health: PASS
 - Page loaded in 1.2s
@@ -97,7 +103,7 @@ echo "$RESULT"
 
 ### Content: PASS
 - Title: "My Application"
-- Main content populated with user data
+- Main content populated
 - No stuck spinners
 
 ### Visual Issues: PASS
@@ -113,14 +119,15 @@ echo "$RESULT"
 
 ## Tips
 
-1. **For localhost URLs**: If Chrome can't access localhost, use your machine's LAN IP:
+1. **Local development** (if using Traefik routing):
    ```bash
-   /validate-ui http://192.168.1.100:3000
+   /validate-ui http://myapp.localhost
+   /validate-ui http://api.myapp.localhost
    ```
 
-2. **For specific checks**: Use the skill directly with custom prompts for more targeted validation.
-
-3. **After deployments**: Run this command to quick-check production deployments:
+2. **Dev/staging environments**:
    ```bash
-   /validate-ui https://myapp.example.com
+   /validate-ui https://myapp-dev.example.com
    ```
+
+3. **For specific checks**: Use the skill directly with custom prompts for more targeted validation.

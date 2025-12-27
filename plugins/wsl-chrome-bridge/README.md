@@ -16,11 +16,11 @@ This plugin provides patterns and commands to invoke a separate Claude instance 
 ## Installation
 
 ```bash
-# From your project directory
-claude plugin add /mnt/c/projects/prompt-kit/plugins/wsl-chrome-bridge
+# From prompt-kit marketplace
+claude plugin install wsl-chrome-bridge
 
-# Or via git URL
-claude plugin add https://github.com/konradish/prompt-kit/tree/main/plugins/wsl-chrome-bridge
+# Or from local path
+claude plugin add /path/to/prompt-kit/plugins/wsl-chrome-bridge
 ```
 
 ## Prerequisites
@@ -54,7 +54,8 @@ The skill auto-activates on phrases like:
 ### Manual Command
 
 ```bash
-/validate-ui http://localhost:3000
+/validate-ui http://myapp.localhost
+/validate-ui https://myapp-dev.example.com
 ```
 
 ### Direct Invocation Pattern
@@ -98,7 +99,7 @@ Instead of taking screenshots and parsing them, instruct Windows Claude to extra
 
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'Go to http://localhost:3000 and tell me:
+claude -p 'Go to http://myapp.localhost and tell me:
 - Page title
 - Navigation items
 - Any error messages
@@ -115,10 +116,10 @@ Return as structured text.' --chrome --dangerously-skip-permissions"
 # After modifying frontend code
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'Check http://localhost:3000/dashboard:
+claude -p 'Check http://myapp.localhost:
 1. Does it load without errors?
-2. Is the new chart component visible?
-3. Does the filter dropdown work?
+2. Is the main content visible?
+3. Does the search box work?
 Report PASS/FAIL for each.' --chrome --dangerously-skip-permissions"
 ```
 
@@ -127,20 +128,19 @@ Report PASS/FAIL for each.' --chrome --dangerously-skip-permissions"
 ```bash
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'On http://localhost:3000/contact:
-1. Fill the name field with \"Test User\"
-2. Fill the email field with \"test@example.com\"
-3. Fill the message field with \"Hello\"
-4. Click Submit
-5. Tell me what happens - success, error, or redirect?' --chrome --dangerously-skip-permissions"
+claude -p 'On http://myapp.localhost/login:
+1. Fill the email field with \"test@example.com\"
+2. Fill the password field with \"password123\"
+3. Click Sign In
+4. Tell me what happens - success, error, or redirect?' --chrome --dangerously-skip-permissions"
 ```
 
-### Check Production Deployment
+### Check Dev/Staging Deployment
 
 ```bash
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'Quick health check on https://myapp.com:
+claude -p 'Quick health check on https://myapp-dev.example.com:
 - Page loads
 - No error banners
 - Navigation works

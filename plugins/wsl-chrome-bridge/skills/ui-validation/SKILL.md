@@ -93,8 +93,8 @@ linux_to_windows() {
 }
 
 # Example
-linux_to_windows "/mnt/c/projects/meal_tracker"
-# Output: C:\projects\meal_tracker
+linux_to_windows "/mnt/c/projects/myapp"
+# Output: C:\projects\myapp
 ```
 
 ## Validation Patterns
@@ -106,7 +106,7 @@ linux_to_windows "/mnt/c/projects/meal_tracker"
 ```bash
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'Navigate to http://localhost:3000 and tell me:
+claude -p 'Navigate to http://myapp.localhost and tell me:
 1. What is the page title?
 2. Is there a login button visible?
 3. List all navigation menu items
@@ -122,7 +122,7 @@ Return the answers as a structured list.' --chrome --dangerously-skip-permission
 ```bash
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'On http://localhost:3000/login:
+claude -p 'On http://myapp.localhost/login:
 1. Enter \"test@example.com\" in the email field
 2. Enter \"password123\" in the password field
 3. Click the Submit button
@@ -138,13 +138,13 @@ Return the result.' --chrome --dangerously-skip-permissions"
 ```bash
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'Test the recipe search flow on https://recipebrain-frontend-dev.konradish.workers.dev:
-1. Click on Recipes in the navigation
-2. Type \"pasta\" in the search box
+claude -p 'Test the search flow on http://myapp.localhost:
+1. Click on Search in the navigation
+2. Type \"test query\" in the search box
 3. Wait for results
-4. Count how many recipes appear
-5. Click \"View Details\" on the first result
-6. Report the recipe name and ingredients list
+4. Count how many results appear
+5. Click on the first result
+6. Report the page title and main content
 
 Return a structured summary of each step.' --chrome --dangerously-skip-permissions"
 ```
@@ -156,7 +156,7 @@ Return a structured summary of each step.' --chrome --dangerously-skip-permissio
 ```bash
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'On http://localhost:3000/dashboard, describe:
+claude -p 'On http://myapp.localhost/dashboard, describe:
 1. Overall layout (header, sidebar, main content areas)
 2. Color scheme being used
 3. Any broken images or missing icons
@@ -173,7 +173,7 @@ Focus on visual issues, not content.' --chrome --dangerously-skip-permissions"
 ```bash
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'On http://localhost:3000, check accessibility:
+claude -p 'On http://myapp.localhost, check accessibility:
 1. Do all images have alt text?
 2. Are form inputs properly labeled?
 3. Is there sufficient color contrast?
@@ -189,15 +189,19 @@ Claude in Chrome has domain restrictions. Common patterns:
 
 | Domain Type | Access |
 |-------------|--------|
-| `*.localhost` | May require approval |
+| `*.localhost` (Traefik) | Usually works |
 | `*.workers.dev` | Usually allowed |
 | Production domains | Usually allowed |
 | `localhost:PORT` | May require approval |
 
-**Workaround**: If localhost is blocked, use the machine's LAN IP or hostname:
+**Local development**: Use Traefik-routed domains:
 ```bash
-# Instead of http://localhost:3000
-# Use http://192.168.1.100:3000 or http://hostname.local:3000
+# Local via Traefik (recommended)
+http://myapp.localhost
+http://api.myapp.localhost
+
+# Or staging/dev environments
+https://myapp-dev.example.com
 ```
 
 ## Output Handling
@@ -209,7 +213,7 @@ Ask Windows Claude to return structured data:
 ```bash
 RESULT=$(powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'Check http://localhost:3000 and return JSON:
+claude -p 'Check http://myapp.localhost and return JSON:
 {
   \"title\": \"page title\",
   \"hasLoginButton\": true/false,
@@ -227,7 +231,7 @@ For complex results, have Windows Claude write to a shared path:
 ```bash
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'Analyze http://localhost:3000 and write a detailed report to C:\projects\output\ui-report.md' --chrome --dangerously-skip-permissions"
+claude -p 'Analyze http://myapp.localhost and write a detailed report to C:\projects\output\ui-report.md' --chrome --dangerously-skip-permissions"
 
 # Then read from WSL
 cat /mnt/c/projects/output/ui-report.md
@@ -258,12 +262,12 @@ claude -p '...' --chrome --dangerously-skip-permissions" 2>&1
 
 ```bash
 # In your dev workflow after making changes
-make frontend-build  # or npm run build
+docker compose up -d --build frontend
 
 # Validate the changes
 powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
-claude -p 'Navigate to http://localhost:3000 after recent changes.
+claude -p 'Navigate to http://myapp.localhost after recent changes.
 Verify:
 1. Page loads without errors
 2. New feature X is visible
@@ -279,7 +283,7 @@ Report pass/fail for each.' --chrome --dangerously-skip-permissions"
 #!/bin/bash
 # validate-ui.sh - Run after deployment
 
-URL="${1:-http://localhost:3000}"
+URL="${1:-http://myapp.localhost}"
 
 RESULT=$(powershell.exe -Command "
 \$env:ANTHROPIC_API_KEY = ''
@@ -302,8 +306,8 @@ fi
 
 ## Comparison: Claude in Chrome vs Direct CDP
 
-| Feature | Claude in Chrome | Direct CDP (prompt-kit scripts) |
-|---------|------------------|--------------------------------|
+| Feature | Claude in Chrome | Direct CDP (Puppeteer/Playwright) |
+|---------|------------------|----------------------------------|
 | Rich interaction | Yes - understands context | Limited - script-based |
 | Form filling | Natural language | Requires selectors |
 | Error handling | Intelligent retry | Manual |
