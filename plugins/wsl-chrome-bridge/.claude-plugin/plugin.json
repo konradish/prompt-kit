@@ -1,0 +1,25 @@
+{
+  "name": "wsl-chrome-bridge",
+  "version": "1.0.0",
+  "description": "Bridge WSL Claude to Windows Chrome for UI validation and browser automation. Uses Claude in Chrome for rich browser interaction from WSL2 environments.",
+  "author": {
+    "name": "konradish",
+    "url": "https://github.com/konradish"
+  },
+  "homepage": "https://github.com/konradish/prompt-kit/tree/main/plugins/wsl-chrome-bridge",
+  "repository": "https://github.com/konradish/prompt-kit",
+  "license": "MIT",
+  "keywords": [
+    "wsl",
+    "chrome",
+    "browser",
+    "ui-testing",
+    "validation",
+    "automation",
+    "claude-in-chrome",
+    "e2e",
+    "screenshot"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/"
+}
